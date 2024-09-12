@@ -19,6 +19,7 @@ class Board:
     
     #string grid with player's own view with ships visible
     def player_view(self):
+        self.board
         # prob just self.board ...may not be needed
         pass
 
