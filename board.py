@@ -12,8 +12,9 @@ class Board:
 
     # string representation of grid
     def __str__(self): 
-        result = "" #initialize empty string for board
-        for row in self.grid: #iterates through eaech row
+        result = "   A B C D E F G H I J\n"  # Add column labels (A-J)
+        for i, row in enumerate(self.grid, 1):  #iterates through eaech row starting at 1 and labels it
+            result += f"{:2} " 
             for space in row: #iterates through each space in row
                 result+=space+ " " #adds space in grid
             result+= "\n" #adds new line at end of row
@@ -22,8 +23,9 @@ class Board:
         
     # string grid with hidden ship locations for opponent
     def opponent_view(self):
-        result = "" # intialize empty string for board
-        for row in self.grid: #iterate through each row
+        result = "   A B C D E F G H I J\n"  # Add column labels (A-J)
+        for i, row in enumerate(self.grid, 1):  #iterates through eaech row starting at 1 and labels it
+            result += f"{:2} "
             for space in row: #iterates through eaech space in the row
                 if space == ' S': #if the space contains a ship it will hide it
                     result += ' _ ' #hids ship with empty space
