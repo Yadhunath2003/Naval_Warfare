@@ -5,23 +5,38 @@ class Board:
     # Miss: space attacked, but no hit: denoted as "O"
     def __init__(self):
         # grid
-        self.grid([" _" for i in range(10)])
+        self.grid = [[" _" for _ in range(10)] for _ in range(10)] #creates 10x10 grid with empty spaces
         # hit count
-        # self.hit_count = 0
+        self.hit_count = 0 #sets hit count to zero and intializes it 
+    
 
     # string representation of grid
-    def __str__(self):
-        pass
+    def __str__(self): 
+        result = "" #initialize empty string for board
+        for row in self.grid: #iterates through eaech row
+            for space in row: #iterates through each space in row
+                result+=space+ " " #adds space in grid
+            result+= "\n" #adds new line at end of row
+        return result
 
+        
     # string grid with hidden ship locations for opponent
     def opponent_view(self):
-        pass
+        result = "" # intialize empty string for board
+        for row in self.grid: #iterate through each row
+            for space in row: #iterates through eaech space in the row
+                if space == ' S': #if the space contains a ship it will hide it
+                    result += ' _ ' #hids ship with empty space
+                else:
+                    result += space + " " #otherwise just returns the emtpy space
+        return result
+  
     
     #string grid with player's own view with ships visible
     def player_view(self):
-        self.board
-        # prob just self.board ...may not be needed
-        pass
+        self.__str__() 
+    
+    
 
     # place ship on board, check for legal positioning of ship as well
     def place_ship(self, ship):
