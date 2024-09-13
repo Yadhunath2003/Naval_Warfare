@@ -12,7 +12,7 @@ class Game:
             5: ["1x1", "1x2", "1x3", "1x4","1x5"]
         }
         self.fleet_type = None
-        
+
         # set opponent
         self.players[0].set_opponent(self.players[1])
         self.players[1].set_opponent(self.players[0])
@@ -27,13 +27,14 @@ class Game:
                 fleet_type = int(input("Choose a fleet type (1, 2, 3, 4, or 5): "))
                 if fleet_type in self.fleet_options:
                     chosen_fleet = self.fleet_options[fleet_type]
-                    self.fleet_type = chosen_fleet
+                    chosen_fleet_copy = self.fleet_options[fleet_type]
+                    self.fleet_type = fleet_type
                 else:
                     print("Invalid fleet type. Please choose 1, 2, 3, 4, or 5.")
             except ValueError:
                 print("Invalid input. Please enter a number (1, 2, 3, 4, or 5).")
             
-        self.players = [Player("Player 1", chosen_fleet), Player("Player 2", chosen_fleet)]
+        self.players = [Player("Player 1", chosen_fleet), Player("Player 2", chosen_fleet_copy)]
 
         # place fleets
         self.players[0].place_fleet()
