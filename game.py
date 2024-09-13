@@ -11,6 +11,7 @@ class Game:
             4: ["1x1", "1x2", "1x3", "1x4"],
             5: ["1x1", "1x2", "1x3", "1x4","1x5"]
         }
+        self.fleet_type = None
         
         # set opponent
         self.players[0].set_opponent(self.players[1])
@@ -26,6 +27,7 @@ class Game:
                 fleet_type = int(input("Choose a fleet type (1, 2, 3, 4, or 5): "))
                 if fleet_type in self.fleet_options:
                     chosen_fleet = self.fleet_options[fleet_type]
+                    self.fleet_type = chosen_fleet
                 else:
                     print("Invalid fleet type. Please choose 1, 2, 3, 4, or 5.")
             except ValueError:
