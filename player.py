@@ -1,3 +1,14 @@
+'''
+Author: Isabel Loney
+Creation Date: September 11, 2024
+Last Modified: September 15, 2024
+Commenting: Provide prologue comments for each function specifying input, output, and a description, as well as any notes/TODOs
+            Provide inline comments for sections of code within functions to clarify functionality and purpose
+Program Name: Battleship - player.py
+Purpose: Player Class that stores player information and provides methods for player interaction
+Source(s): N/A
+'''
+
 from board import Board
 from ship import Ship
 
@@ -28,27 +39,32 @@ class Player:
         accepted = False
         while not accepted:
             for ship in self.fleet:
+                # keep prompting to place a ship until a valid position is given
                 while self.place_ship(ship) == False:
                     continue
+            # once fleet is placed, print board to for user to confirm everything is as desired
             print(self.board.player_view())
             prompt = input("Is this board okay?:\n 1. Yes\n 2. No\nChoice: ").strip()
             if prompt == '1':
                 accepted = True
+            # anything besides 'yes' is considered as 'no'
             else:
                 print("Resetting board")
+                # clear board
                 self.board.grid = [[" _" for i in range(10)] for i in range(10)]
                 print("Board reset")
         # clear all previous text
         print("\033[H\033[J", end="")
-
         
     
     # Input: a single ship
     # Output: Boolean indicating whether placing the ship was successful
     # Description: Prompt players for orientation and top left position of ship, then attempt to place ship based on those requests
     def place_ship(self, ship):
+        # constants
         HORIZONTAL_SELECTED = '1'
         VERTICAL_SELECTED = '2'
+
         # show board as is 
         print("Current board: ")
         print(self.board.player_view())
@@ -56,6 +72,8 @@ class Player:
         print("Placing ship with length ", ship.size)
         # ask orientation horizontal or vertical
         valid_orientation_selected = False
+        # keep prompting for orientation until '1' or '2' is entered
+        # then set orientation
         while not valid_orientation_selected:
             orientation = input("Choose Orientation:\n 1. Horizontal\n 2. Vertical \nPlayer choice: ").strip()
             if orientation == HORIZONTAL_SELECTED:
@@ -68,12 +86,14 @@ class Player:
                 print("Invalid orientation")
 
 
-        # prompt for top left position of boat
+        # prompt for and set top left position of boat
         col_valid = False
         col = ''
+        # keep prompting until valid column given
         while not col_valid:
             col = input("Enter column from A-J: ").strip()
             # Python supports comparisons of strings based on their ASCII number, so this is okay despite how strange it looks
+            # only accept 1 letter answers to avoid any confusion
             if (col >= 'A' and col <= 'J') or (col >= 'a' and col <= 'j') and (len(col) < 2):
                 # gives a number 0-10 ('a' ascii value is 97, successive letters go up by 1 in alphabetical order)
                 ship.x = ord(col.lower()) - 97
@@ -81,6 +101,7 @@ class Player:
             else:
                 print("Invalid column")
         
+        # keep prompting until row column given
         row_valid = False
         row = 0
         while not row_valid:
@@ -92,6 +113,7 @@ class Player:
                     # -1 to make it easier to work with 0-indexed lists
                     ship.y = row-1
                     row_valid = True
+            # non-integer provided
             except ValueError:
                 print("Invalid row number")
 
@@ -109,7 +131,7 @@ class Player:
         print(f"No cheating, {self.opponent.player_name}! Look away!")
         input("Press enter to begin turn")
 
-        # display boards (handle public and private boards).
+        # display boards - player board and opponent board with hits/misses shown and ships hidden
         print("Your board")
         print(self.board.player_view())
         print("Opponent's board")
@@ -118,6 +140,7 @@ class Player:
         # prompt for place to attack
         col_valid = False
         col = ''
+        # keep prompting until valid column given
         while not col_valid:
             col = input("Enter column from A-J: ").strip()
             # Python supports comparisons of strings based on their ASCII number, so this is okay despite how strange it looks
@@ -130,6 +153,7 @@ class Player:
         
         row_valid = False
         row = 0
+        # keep prompting until valid row given
         while not row_valid:
             try:
                 row = int(input("Enter row from 1-10: "))
@@ -142,7 +166,7 @@ class Player:
             except ValueError:
                 print("Invalid row number")
 
-        # do attack and indiciate if hit or miss
+        # attack and indiciate if hit or miss
         if (self.opponent.board.attack(col, row)):
             print("Hit!")
         else:
@@ -157,5 +181,3 @@ class Player:
             input("Press enter to end turn")
             print("\033[H\033[J", end="")
             return False
-
-
