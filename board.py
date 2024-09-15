@@ -33,7 +33,7 @@ class Board:
     # attack method, record attack whether hit or miss. takes in x,y position on board
     def attack(self, x, y):
         position = self.grid[y][x] # checks what's currently at the position
-        if position == "S": # if there's a ship at the position 
+        if position == " S": # if there's a ship at the position 
             self.grid[y][x] = " X" # changes the position from 'S' to 'X' indicating a hit
             self.hit_count += 1 # adds one to the hit count to use later 
             return True # communicates back that there was a hit
