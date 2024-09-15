@@ -1,4 +1,4 @@
-from player.py import Player
+from player import Player
 
 class Game:
 
