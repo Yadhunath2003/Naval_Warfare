@@ -37,12 +37,12 @@ class Board:
                 return False
             
             collision_area = self.grid[ship.y][ship.x:(ship.x+ship.size)]
-            if 'S' in collision_area:
+            if ' S' in collision_area:
                 print("Could not place ship: overlaps with previously placed ship")
                 return False
             
             for i in range(ship.x, ship.x+ship.size):
-                self.grid[ship.y][i] = 'S'
+                self.grid[ship.y][i] = ' S'
             return True
 
         elif ship.orientation == 'vertical':
@@ -51,12 +51,12 @@ class Board:
                 return False
             
             collision_area = [self.grid[i][ship.x] for i in range(ship.y, ship.y+ship.size)]
-            if 'S' in collision_area:
+            if ' S' in collision_area:
                 print("Could not place ship: overlaps with previously placed ship")
                 return False
             
             for i in range(ship.y, ship.y+ship.size):
-                self.grid[i][ship.x] = 'S'
+                self.grid[i][ship.x] = ' S'
             return True
 
     # attack method, record attack whether hit or miss. takes in x,y position on board
