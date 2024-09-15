@@ -107,7 +107,7 @@ class Player:
         # display boards (handle public and private boards).
         print("Your board")
         print(self.board.player_view())
-        print("Opponents Board")
+        print("Opponent's board")
         print(self.opponent.board.opponent_view())
 
         # prompt for place to attack
@@ -139,7 +139,10 @@ class Player:
                 print("Invalid row number")
 
         # do attack and indiciate if hit or miss
-        self.opponent.board.attack(col, row)
+        if (self.opponent.board.attack(col, row)):
+            print("Hit!")
+        else:
+            print("Miss!")
 
         # check for opponent defeat
         if self.opponent.board.defeat(fleet_type):
