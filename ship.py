@@ -1,6 +1,5 @@
 class Ship:
-    def __init__(self, ship_type, size):
-        self.ship_type = ship_type
+    def __init__(self, size):
         self.size = size
         self.x = None
         self.y = None
@@ -12,5 +11,3 @@ class Ship:
 
     def set_orientation(self, orientation):
         self.orientation = orientation
-
-        # this file is basically done LOL?

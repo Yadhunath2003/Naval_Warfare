@@ -1,5 +1,3 @@
-from game import Game
-
 class Board:
     # Ships: space that contains ship: denoted as "S" (or s1 or s2 for players one or two.. depends)
     # Empty: space w no ship: denoted _
@@ -18,8 +16,8 @@ class Board:
         for i, row in enumerate(self.grid, 1):  #iterates through eaech row starting at 1 and labels it
             result += f"{i:2} " 
             for space in row: #iterates through each space in row
-                result+=space+ " " #adds space in grid
-            result+= "\n" #adds new line at end of row
+                result += space + " " #adds space in grid
+            result += "\n" #adds new line at end of row
         return result
 
         
@@ -33,6 +31,7 @@ class Board:
                     result += ' _ ' #hids ship with empty space
                 else:
                     result += space + " " #otherwise just returns the emtpy space
+            result += "\n" # adds new line at end of row
         return result
   
     
@@ -93,6 +92,6 @@ class Board:
             return False
     
     # check if player has lost
-    def defeat(self):
+    def defeat(self, fleet_type):
         fleet_hit_counts = {1: 1, 2: 3, 3: 6, 4: 10, 5: 15} # this assigns the fleet sizes (1 - 5) with the number of ship hit points they'll have
-        return self.hit_count == fleet_hit_counts.get(Game.fleet_type, 0) # checks if the hit_count matches the required number of hits to defeat the fleet, depending on the value from Game.fleet_type
+        return self.hit_count == fleet_hit_counts.get(fleet_type, 0) # checks if the hit_count matches the required number of hits to defeat the fleet, depending on the value from Game.fleet_type
