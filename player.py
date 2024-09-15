@@ -3,12 +3,13 @@ Author: Isabel Loney
 Creation Date: September 11, 2024
 Last Modified: September 15, 2024
 Commenting: Provide prologue comments for each function specifying input, output, and a description, as well as any notes/TODOs
-            Provide inline comments for sections of code within functions to clarify functionality and purpose
+            Provide inline comments for sections of code within functions to clarify functionality and purpose. Written on 9/15/24
 Program Name: Battleship - player.py
 Purpose: Player Class that stores player information and provides methods for player interaction
-Source(s): N/A
+Source(s): https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py for class and method structure (i.e. method names, class name)
+Other collaborators: Code reviewed and tested by Jackson Wunderlich
 '''
-
+# All code written by Isabel Loney
 from board import Board
 from ship import Ship
 

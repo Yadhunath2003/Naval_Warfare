@@ -7,7 +7,9 @@ Input: None
 Output: Prints out each players boards after each turn in Battleship.
 Program Name: Battleship - board.py
 Commenting: provides in line comments about function, input, output, and description
-Description: Displays player's board for each turn in battleship and tracks the amounts of hits/nonhits. 
+Description: Displays player's board for each turn in battleship and tracks the amounts of hits/nonhits.
+Source(s): https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py for class and method names/program structure
+Other collaborators: Code reviewed and tested by Jackson Wunderlich
 '''
 #lines 13-53 written by Ginny Ke
 class Board:
