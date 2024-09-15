@@ -1,5 +1,5 @@
 class Board:
-    # Ships: space that contains ship: denoted as "S" (or s1 or s2 for players one or two.. depends)
+    # Ships: space that contains ship: denoted as "S"
     # Empty: space w no ship: denoted _
     # Hit: space that used to be ship, was hit: denoted as "X"
     # Miss: space attacked, but no hit: denoted as "O"
@@ -43,12 +43,9 @@ class Board:
 
     # Input: a ship
     # Output: Boolean indicating if placing the ship was a success
-    # Description: place ship on board
+    # Description: place ship on board. Makes sure the entire ship stays on the board
+    # and it does not intersect with ships already placed
     # Notes: player.py/place_ship has already handled whether a valid top left position has been selected 
-    # (TODO: that logic can and probably should be moved here but I'm too lazy to do that rn)
-    # this fucntion must make sure:
-    #   a. The entire ship stays on the board
-    #   b. it does not intersect with ships already placed
     def place_ship(self, ship):
         if ship.orientation == 'horizontal':
             if ship.x + ship.size > 10:
@@ -78,7 +75,9 @@ class Board:
                 self.grid[i][ship.x] = ' S'
             return True
 
-    # attack method, record attack whether hit or miss. takes in x,y position on board
+    # Input: Integer x and y coordinates
+    # Output: Boolean indicating whether there was a hit
+    # Description: attack at specified coordinates, and mark X for hit and O for miss
     def attack(self, x, y):
         position = self.grid[y][x] # checks what's currently at the position
         if position == " S": # if there's a ship at the position 
@@ -91,7 +90,10 @@ class Board:
         else: # returns false if both cases above don't work
             return False
     
-    # check if player has lost
+    # Input: The fleet type
+    # Output: Boolean value indicating whether the game is over
+    # Description: Determine how many hits are needed to win a game based on fleet type
+    # and return whether that threshold has been met
     def defeat(self, fleet_type):
         fleet_hit_counts = {1: 1, 2: 3, 3: 6, 4: 10, 5: 15} # this assigns the fleet sizes (1 - 5) with the number of ship hit points they'll have
         return self.hit_count == fleet_hit_counts.get(fleet_type, 0) # checks if the hit_count matches the required number of hits to defeat the fleet, depending on the value from Game.fleet_type

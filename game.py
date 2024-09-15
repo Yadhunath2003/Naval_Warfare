@@ -3,8 +3,10 @@ from ship import Ship
 
 class Game:
 
+    # Input: None
+    # Output: A game object
+    # Description: Game object constructor
     def __init__(self):
-        # (TODO) set the fleet type for the game (1 ship fleet, 2 ship fleet, etc.) // Anakha Completed 9/12
         self.fleet_options = {
             1: [Ship(1)],
             2: [Ship(1), Ship(2)],
@@ -14,10 +16,9 @@ class Game:
         }
         self.fleet_type = None
 
-        
-
-
-    # method to run game, position boats, loop, turn alternating until win
+    # Input: Player input specifying when to begin turn, where to place ships, and where to attack
+    # Output: The player's own board and an onfuscated view of the opponent's board
+    # Description: method to run the game, position boats, attack, and alternate turns until a player wins
     def play(self):
         # prompt for fleet type
         chosen_fleet = None

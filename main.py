@@ -1,7 +1,12 @@
 from game import Game
 
-# ask how many ships for fleet the players want to do
+# Input: None
+# Output: Displays game to players
+# Description: create a Game object and start playing
+def main():
+  game = Game()
+  game.play()
 
-# create game and start it
-game = Game()
-game.play()
+# Entry Point
+if __name__ == "__main__":
+  main()
