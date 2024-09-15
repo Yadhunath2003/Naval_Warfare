@@ -1,3 +1,13 @@
+'''
+Author: Anakha Krishna
+Creation Date: 
+Last Modified: 
+Commenting: All comments written on 
+Program Name: 
+Purpose:
+Source(s): 
+'''
+
 class Ship:
     # Input: the size (length) of the ship
     # Output: A ship object
