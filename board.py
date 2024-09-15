@@ -9,7 +9,7 @@ Program Name: Battleship - board.py
 Commenting: provides in line comments about function, input, output, and description
 Description: Displays player's board for each turn in battleship and tracks the amounts of hits/nonhits. 
 '''
-
+#lines 13-53 written by Ginny Ke
 class Board:
     # Ships: space that contains ship: denoted as "S"
     # Empty: space w no ship: denoted _
@@ -52,7 +52,7 @@ class Board:
         return self.__str__() 
     
     
-
+#lines 56-111 written by Dylan Sailors
     # Input: a ship
     # Output: Boolean indicating if placing the ship was a success
     # Description: place ship on board. Makes sure the entire ship stays on the board
