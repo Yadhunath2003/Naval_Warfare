@@ -1,10 +1,12 @@
 '''
 Names: Ginny Ke & Dylan Sailors
 Assignment: EECS 581 Project 1
-Date: 9/10/24
+Creation Date: 9/10/24
 Date Last Edited: 9/15/24
 Input: None
 Output: Prints out each players boards after each turn in Battleship.
+Program Name: Battleship - board.py
+Commenting: provides in line comments about function, input, output, and description
 Description: Displays player's board for each turn in battleship and tracks the amounts of hits/nonhits. 
 '''
 
