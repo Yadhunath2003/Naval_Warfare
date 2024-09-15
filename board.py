@@ -1,3 +1,13 @@
+'''
+Names: Ginny Ke & Dylan Sailors
+Assignment: EECS 581 Project 1
+Date: 9/10/24
+Date Last Edited: 9/15/24
+Input: None
+Output: Prints out each players boards after each turn in Battleship.
+Description: Displays player's board for each turn in battleship and tracks the amounts of hits/nonhits. 
+'''
+
 class Board:
     # Ships: space that contains ship: denoted as "S"
     # Empty: space w no ship: denoted _
