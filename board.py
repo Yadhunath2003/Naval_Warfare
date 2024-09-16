@@ -57,41 +57,42 @@ class Board:
         return self.__str__() 
     
     
-#lines 60-116 written by Dylan Sailors
+#lines 60-93 written by Isabel Loney
     # Input: a ship
     # Output: Boolean indicating if placing the ship was a success
     # Description: place ship on board. Makes sure the entire ship stays on the board
     # and it does not intersect with ships already placed
     # Notes: player.py/place_ship has already handled whether a valid top left position has been selected 
-    def place_ship(self, ship):
-        if ship.orientation == 'horizontal':
-            if ship.x + ship.size > 10:
-                print("Could not place ship: entire ship must be on the board")
-                return False
+    def place_ship(self, ship): 
+        if ship.orientation == 'horizontal': # if the orientation chosen was horizontal
+            if ship.x + ship.size > 10: # and if the ship x and ship size is greater than 10
+                print("Could not place ship: entire ship must be on the board") # throws an error that the ship couldn't be placed
+                return False # returns false because error was run into
             
-            collision_area = self.grid[ship.y][ship.x:(ship.x+ship.size)]
-            if ' S' in collision_area:
-                print("Could not place ship: overlaps with previously placed ship")
-                return False
+            collision_area = self.grid[ship.y][ship.x:(ship.x+ship.size)] # sets the collision area to the area where a ship is wanting to be placed
+            if ' S' in collision_area: # if there's a ship in the collision area 
+                print("Could not place ship: overlaps with previously placed ship") # throws error that the player selected a spot where a ship already is
+                return False # returns false because error was run into
             
-            for i in range(ship.x, ship.x+ship.size):
-                self.grid[ship.y][i] = ' S'
-            return True
+            for i in range(ship.x, ship.x+ship.size): # sets range of the ship x and the ship x + size
+                self.grid[ship.y][i] = ' S' # places the ship onto the board by changing the _ to S taking into account the length
+            return True # returns true because there weren't any errors or collisions
 
-        elif ship.orientation == 'vertical':
-            if ship.y + ship.size > 10:
-                print("Could not place ship: entire ship must be on the board")
-                return False
+        elif ship.orientation == 'vertical': # if the orientation chosen was vertical
+            if ship.y + ship.size > 10: # and if the ship y and ship size is greater than 10
+                print("Could not place ship: entire ship must be on the board") # throws an error that the ship couldn't be placed
+                return False # returns false because error was run into
             
-            collision_area = [self.grid[i][ship.x] for i in range(ship.y, ship.y+ship.size)]
-            if ' S' in collision_area:
-                print("Could not place ship: overlaps with previously placed ship")
-                return False
+            collision_area = [self.grid[i][ship.x] for i in range(ship.y, ship.y+ship.size)] # sets the collision are to the area where a ship is wanting to be placed
+            if ' S' in collision_area: # if there's a ship in the collision area
+                print("Could not place ship: overlaps with previously placed ship") # throws error that the player selected a spot where a ship already is
+                return False # returns false because error was run into
             
-            for i in range(ship.y, ship.y+ship.size):
-                self.grid[i][ship.x] = ' S'
-            return True
+            for i in range(ship.y, ship.y+ship.size): # sets range to the ship y and the ship y + size
+                self.grid[i][ship.x] = ' S' # places the ship onto the board by changing the _ to S taking into account the length
+            return True # returns true because there weren't any errors or collisions
 
+    #lines 95-117 written by Dylan Sailors
     # Input: Integer x and y coordinates
     # Output: Boolean indicating whether there was a hit
     # Description: attack at specified coordinates, and mark X for hit and O for miss
