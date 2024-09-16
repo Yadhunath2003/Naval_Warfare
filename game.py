@@ -35,7 +35,7 @@ class Game:
         chosen_fleet = None
         while chosen_fleet is None: # Prompt for fleet type until valid fleet type is givens
             try:
-                fleet_type = int(input("Choose a fleet type (1, 2, 3, 4, or 5): ")) # prompt user for fleet type
+                fleet_type = int(input("Choose how many ships will be in your fleet (1, 2, 3, 4, or 5): ")) # prompt user for fleet type
                 if fleet_type in self.fleet_options: # if valid input,
                     chosen_fleet = self.fleet_options[fleet_type] # set fleet type in chosen_fleet for player 1 use
                     chosen_fleet_copy = self.fleet_options[fleet_type] # set fleet type in chosen_fleet_copy for player 2 use
