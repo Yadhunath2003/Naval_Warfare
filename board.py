@@ -11,7 +11,7 @@ Description: Displays player's board for each turn in battleship and tracks the 
 Source(s): https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py for class and method names/program structure
 Other collaborators: Code reviewed and tested by Jackson Wunderlich
 '''
-#lines 13-53 written by Ginny Ke
+#lines 14-57 written by Ginny Ke
 class Board:
     # Ships: space that contains ship: denoted as "S"
     # Empty: space w no ship: denoted _
@@ -23,8 +23,9 @@ class Board:
         # hit count
         self.hit_count = 0 #sets hit count to zero and intializes it 
     
-
-    # string representation of grid
+    #input none
+    #output: grid
+    #description: string representation of grid
     def __str__(self): 
         result = "    A  B  C  D  E  F  G  H  I  J\n"  # Add column labels (A-J)
         for i, row in enumerate(self.grid, 1):  #iterates through eaech row starting at 1 and labels it
@@ -33,9 +34,10 @@ class Board:
                 result += space + " " #adds space in grid
             result += "\n" #adds new line at end of row
         return result
-
-        
-    # string grid with hidden ship locations for opponent
+    #input none
+    #output: opponent battleship view
+    #description: displays the opponenets board with ships hidden. 
+    #Note: string grid with hidden ship locations for opponent
     def opponent_view(self):
         result = "    A  B  C  D  E  F  G  H  I  J\n"  # Add column labels (A-J)
         for i, row in enumerate(self.grid, 1):  #iterates through eaech row starting at 1 and labels it
@@ -47,14 +49,15 @@ class Board:
                     result += space + " " #otherwise just returns the emtpy space
             result += "\n" # adds new line at end of row
         return result
-  
-    
-    #string grid with player's own view with ships visible
+    #input: None
+    #output: players  battleship board view. 
+    #description: returns the battleship view for the player
+    #Note: string grid with player's own view with ships visible
     def player_view(self):
         return self.__str__() 
     
     
-#lines 56-111 written by Dylan Sailors
+#lines 60-116 written by Dylan Sailors
     # Input: a ship
     # Output: Boolean indicating if placing the ship was a success
     # Description: place ship on board. Makes sure the entire ship stays on the board
