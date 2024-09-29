@@ -12,9 +12,9 @@ from player import Player
 from board import Board
 
 class AIPlayer(Player):
-    def __init__(self, difficulty, board, fleet):
+    def __init__(self, difficulty, player_name, fleet):
         # Initialize the AI player with a given difficulty level, the game board, and a fleet of ships.
-        super().__init__(board, fleet)
+        super().__init__(player_name, fleet)
         self.difficulty = difficulty
         self.last_hit = None  # Tracks the last successful hit to focus on targeted firing
         self.previous_hits = []  # List to track all the successful hits, useful for more advanced strategies
@@ -128,11 +128,12 @@ class AIPlayer(Player):
         Executes the AI's turn, determining a firing position and attacking the opponent.
         """
         move = self.fire()  # Get the firing position based on the AI's difficulty strategy
-        if self.opponent.board.attack(*move):  # Attack the chosen position
-            print(f"{self.player_name} hits at {move}!")  # If hit, notify and update last_hit
-            self.last_hit = move  # Store the last successful hit for future targeted firing
+        if self.opponent.board.attack(*move):
+            print(f"{self.player_name} hits at {move}!")
+            self.hits += 1  # Update hits
+            self.last_hit = move
         else:
-            print(f"{self.player_name} misses at {move}.")  # If miss, notify
+            print(f"{self.player_name} misses at {move}.")
+            self.misses += 1  # Update misses
 
-        # Checks if the opponent's fleet has been completely destroyed
         return self.opponent.board.defeat(fleet_type)

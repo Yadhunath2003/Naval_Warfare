@@ -54,7 +54,7 @@ class Game:
                 except ValueError:
                     print("Invalid input. Please enter a number.")
             player1 = Player("Player 1", chosen_fleet)
-            ai_player = AIPlayer(difficulty, player1.board, chosen_fleet_copy)
+            ai_player = AIPlayer(difficulty, f"Computer ({difficulty})", chosen_fleet_copy)
             self.players = [player1, ai_player]
             print(f"You will be playing against the computer ({difficulty} level).")
         else:
@@ -100,12 +100,12 @@ class Game:
         if isinstance(self.players[current_player_index], AIPlayer):
             print("Game over... AI wins!")
         else:
-            print(f"Game over... {self.players[current_player_index].player_name} wins!")
+            print(f"Game over... {self.players[current_player_index].player_name} wins!\n")
 
         # Final display of the scorecard after the game ends
         self.display_scorecard()
 
     def display_scorecard(self):
         print(f"Scorecard:")
-        print(f"{self.players[0].player_name}: Hits - {self.players[0].hits}, Misses - {self.players[0].misses}")
-        print(f"{self.players[1].player_name}: Hits - {self.players[1].hits}, Misses - {self.players[1].misses}")
+        for player in self.players:
+            print(f"\n{player.player_name}: Hits - {player.hits}, Misses - {player.misses}\n")

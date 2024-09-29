@@ -19,8 +19,6 @@ def main():
     game = Game()
     game.play()
     
-    # Call the display_scorecard after each round
-    game.display_scorecard()  # Show the final scorecard at the end of the game
 
 # Entry Point
 # Written by Isabel Loney
