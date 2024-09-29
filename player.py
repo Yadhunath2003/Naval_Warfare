@@ -36,7 +36,7 @@ class Player:
     # Description: position ships with for loop of place_ships + board confirmation to finalize board
     def place_fleet(self):
         print(f"{self.player_name}'s turn to place ships")
-        print(f"No cheating,\n{self.opponent.player_name}! Look away!")
+        print(f"No cheating,\n{self.opponent.player_name}")
         input("Press enter to begin")
         
         accepted = False
@@ -101,7 +101,7 @@ class Player:
 
     def take_turn(self, fleet_type):
         print(f"{self.player_name}'s turn to attack")
-        print(f"No cheating, {self.opponent.player_name}! Look away!")
+        print(f"No cheating,\n{self.opponent.player_name}")
         input("Press enter to begin turn")
 
         print("Your board")
