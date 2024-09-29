@@ -39,10 +39,10 @@ class Game:
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
-        opponent_choice = input("Do you want to play against the computer or a human? (computer/human): ").strip().lower()
+        opponent_choice = input("Do you want to play against AI or a human? (AI/human): ").strip().lower()
         chosen_fleet_copy = chosen_fleet.copy()
 
-        if opponent_choice == "computer":
+        if opponent_choice == "AI" or "ai":
             difficulty = None
             while difficulty is None:
                 try:
@@ -54,9 +54,9 @@ class Game:
                 except ValueError:
                     print("Invalid input. Please enter a number.")
             player1 = Player("Player 1", chosen_fleet)
-            ai_player = AIPlayer(difficulty, f"Computer ({difficulty})", chosen_fleet_copy)
+            ai_player = AIPlayer(difficulty, f"AI ({difficulty})", chosen_fleet_copy)
             self.players = [player1, ai_player]
-            print(f"You will be playing against the computer ({difficulty} level).")
+            print(f"You will be playing against AI at ({difficulty} level).")
         else:
             player1 = Player("Player 1", chosen_fleet)
             player2 = Player("Player 2", chosen_fleet_copy)
