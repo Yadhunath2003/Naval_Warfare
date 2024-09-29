@@ -4,69 +4,134 @@ Creation Date: 9/10/24
 Last Modified: 9/15/24
 Commenting: All comments written on 9/15/24 by Anakha Krishna and Isabel Loney
 Program Name: Battleship - game.py
-Purpose: Create and run the Battleship game
-Source(s):
-https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py
+Purpose: Create and run battleship game
+Source(s): https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py
 Other collaborators: Code reviewed and tested by Jackson Wunderlich
+
+
+Modified by Group 5
+Modification start data: 9/25/2024
+Modification end date: 9/29/2024
+Modified by: Yadhunath Tharakeswaran
+Changes made: Added the Computer feature to the game, so that the player has the flexibility to either play with the AI or Human.
+The Computer player contains 3 levels of Difficulties: Easy, Medium, and Hard.
+And they also have the ability to automatically place and attack the opponent's fleet automatically.
 '''
+# Code structure adapted from https://ils.unc.edu/courses/2017_spring/inls560_001/a/battleship.py BattleshipGame class and modified for this projects purposes
+# Code written by Anakha Krishna
 from player import Player
-from ai_player import AIPlayer  # Import the AIPlayer class
 from ship import Ship
-import copy  # To ensure fleet copies are deep copies
+from ai import AIPlayer  # Import AIPlayer which now handles all difficulties
+
 class Game:
-   # Input: player1 and player2 objects, which can be either human (Player) or AI (AIPlayer)
-   # Output: A game object
-   # Description: Game object constructor
-   def __init__(self, player1=None, player2=None):
-       # Create lists of fleet types without ship names (only sizes)
-       self.fleet_options = {
-           1: [Ship(1)],
-           2: [Ship(1), Ship(2)],
-           3: [Ship(1), Ship(2), Ship(3)],
-           4: [Ship(1), Ship(2), Ship(3), Ship(4)],
-           5: [Ship(1), Ship(2), Ship(3), Ship(4), Ship(5)]
-       }
-       self.fleet_type = None  # Chosen fleet type
-       self.players = [player1, player2]  # Support for AI or human players
-   # Input: Player input specifying when to begin turn, where to place ships, and where to attack
-   # Output: The player's board and an obfuscated view of the opponent's board
-   # Description: Run the game, position boats, attack, and alternate turns until a player wins
-   def play(self):
-       print("Welcome to Battleship!")
-       chosen_fleet = None
-       while chosen_fleet is None:  # Prompt for fleet type until valid fleet type is given
-           try:
-               fleet_type = int(input("Choose how many ships will be in your fleet (1, 2, 3, 4, or 5): "))  # Prompt user for fleet type
-               if fleet_type in self.fleet_options:  # If valid input,
-                   chosen_fleet = self.fleet_options[fleet_type]  # Set fleet type for player 1
-                   chosen_fleet_copy = copy.deepcopy(self.fleet_options[fleet_type])  # Deep copy for player 2 to avoid reference issues
-                   self.fleet_type = fleet_type  # Set fleet type for future use
-               else:
-                   print("Invalid fleet type. Please choose 1, 2, 3, 4, or 5.")  # Handle invalid input
-           except ValueError:
-               print("Invalid input. Please enter a number (1, 2, 3, 4, or 5).")  # Handle invalid input
-       # If players were not provided (human vs human mode)
-       if self.players[0] is None or self.players[1] is None:
-           opponent_type = input("Do you want to play against a human or AI? (human/AI): ").strip().lower()
-           if opponent_type == "ai":
-               difficulty = input("Select AI difficulty (Easy/Medium/Hard): ").strip().capitalize()
-               self.players[0] = Player("Player 1", chosen_fleet)  # Player 1 is always human
-               self.players[1] = AIPlayer(difficulty, self.players[0].board, chosen_fleet_copy)  # Player 2 is AI
-           else:
-               self.players = [Player("Player 1", chosen_fleet), Player("Player 2", chosen_fleet_copy)]  # Both human players
-       # Set opponent
-       self.players[0].set_opponent(self.players[1])
-       self.players[1].set_opponent(self.players[0])
-       # Place fleets
-       self.players[0].place_fleet()
-       self.players[1].place_fleet()
-       input("All ships in place. Players...are you ready? Press enter to begin the battle!")  # Prompt for game to start
-       # Game loop
-       game_over = False  # Will handle take_turn() boolean result (True if game won, False if game continues)
-       current_player_index = 0  # Keeps track of which player's turn it is
-       while not game_over:
-           current_player = self.players[current_player_index]  # Start with players[0]
-           game_over = current_player.take_turn(self.fleet_type)  # Call take_turn and assign to game_over
-           if not game_over:  # Continue game if take_turn() returns false
-               current_player_index = 1 - current_player_index  # Switch to next player's turn
-       print(f"Game over... {self.players[current_player_index].player_name} wins!")  # Print winner
+    # Input: None
+    # Output: A game object
+    # Description: Game object constructor
+    def __init__(self):
+        self.fleet_options = {  # create lists of fleet types
+            1: [Ship(1)],
+            2: [Ship(1), Ship(2)],
+            3: [Ship(1), Ship(2), Ship(3)],
+            4: [Ship(1), Ship(2), Ship(3), Ship(4)],
+            5: [Ship(1), Ship(2), Ship(3), Ship(4), Ship(5)]
+        }
+        self.fleet_type = None  # chosen fleet type 
+
+    # Input: Player input specifying when to begin turn, where to place ships, and where to attack
+    # Output: The player's own board and an opponent's board with ships hidden
+    # Description: method to run the game, position boats, attack, and alternate turns until a player wins
+    # The player 1 would be asked to play with an ai or human, and based on user's choice the game chooses the second player to be either ai or human.
+    def play(self):
+        print("Welcome to Battleship!")
+        chosen_fleet = None
+        while chosen_fleet is None:  # Prompt for fleet type until valid fleet type is given
+            try:
+                fleet_type = int(input("Choose how many ships will be in your fleet (1, 2, 3, 4, or 5): "))  # prompt user for fleet type
+                if fleet_type in self.fleet_options:  # if valid input,
+                    chosen_fleet = self.fleet_options[fleet_type]  # set fleet type in chosen_fleet for player 1 use
+                    self.fleet_type = fleet_type
+                else:
+                    print("Invalid choice.")
+            except ValueError:
+                print("Invalid input. Please enter a number.")
+        
+        # Ask if the user wants to play against a computer or a human
+        opponent_choice = input("Do you want to play against the computer or a human? (computer/human): ").strip().lower()
+        chosen_fleet_copy = chosen_fleet.copy()  # Copy fleet for Player 2 (AI or human)
+        
+        if opponent_choice == "computer":
+            # Ask for AI difficulty level
+            difficulty = None
+            while difficulty is None:
+                try:
+                    difficulty_input = int(input("Choose AI difficulty:\n1. Easy\n2. Medium\n3. Hard\nYour choice: "))
+                    if difficulty_input in [1, 2, 3]:
+                        if difficulty_input == 1:
+                            difficulty = "Easy"
+                        elif difficulty_input == 2:
+                            difficulty = "Medium"
+                        else:
+                            difficulty = "Hard"
+                    else:
+                        print("Invalid choice. Please select 1, 2, or 3.")
+                except ValueError:
+                    print("Invalid input. Please enter a number.")
+            
+            # Create human player, and Player 2 is the AI with chosen difficulty and board from Player 1
+            player1 = Player("Player 1", chosen_fleet)
+            ai_player = AIPlayer(difficulty, player1.board, chosen_fleet_copy)
+            self.players = [player1, ai_player] ##The game is going to be ai vs human
+            print(f"You will be playing against the computer ({difficulty} level).")
+
+        else:
+            # Both players are human players
+            player1 = Player("Player 1", chosen_fleet)
+            player2 = Player("Player 2", chosen_fleet_copy)
+            self.players = [player1, player2]
+            print("You will be playing against a human.")
+
+        # Set opponent for each player
+        self.players[0].set_opponent(self.players[1])
+        self.players[1].set_opponent(self.players[0])
+
+        # Player one places the fleet first
+        self.players[0].place_fleet()
+
+        # Depending on the choice they made, player 2 or ai will be placing thier fleet next.
+        if isinstance(self.players[1], AIPlayer):
+            self.players[1].place_ships()  # AI places ships automatically
+        else:
+            self.players[1].place_fleet()  # Human player manually places fleet
+
+        input("All ships are placed. Press enter to begin the battle!")
+
+
+        # Game loop
+        game_over = False  # will handle take_turn() boolean result (True if game won, False if game continues)
+        current_player_index = 0  # keeps track of whose turn it is, starting with Player 1
+
+        while not game_over:
+            current_player = self.players[current_player_index]  # Start with Player 1 or AI/Human opponent
+
+        # If the current player is Player 1 (Human), ask for input to take a turn
+            if current_player_index == 0 and isinstance(current_player, Player):
+                game_over = current_player.take_turn(self.fleet_type)  # Human player takes turn
+            else:
+                # If the current player is the AI, automatically take its turn
+                if isinstance(current_player, AIPlayer):
+                    print(f"{current_player.player_name}'s turn (AI - {current_player.difficulty})...")
+                else:
+                    print(f"{current_player.player_name}'s turn (Human)...")
+
+                # AI or second human player takes turn
+                game_over = current_player.take_turn(self.fleet_type)
+
+            # Switch turns if the game is not over
+            if not game_over:
+                current_player_index = 1 - current_player_index  # Switch between Player 1 and Player 2 (AI or Human)
+
+        # Game over: announce the winner
+        if isinstance(self.players[current_player_index], AIPlayer):
+            print("Game over... AI wins!")
+        else:
+            print(f"Game over... {self.players[current_player_index].player_name} wins!")
