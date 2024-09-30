@@ -135,5 +135,7 @@ class AIPlayer(Player):
         else:
             print(f"{self.player_name} misses at {move}.")
             self.misses += 1  # Update misses
-
+        # Display the board after the AI takes a turn
+        print("Opponent's board after AI turn:")
+        print(self.opponent.board.opponent_view())
         return self.opponent.board.defeat(fleet_type)
