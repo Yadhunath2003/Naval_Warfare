@@ -1,7 +1,3 @@
-"""
-Programmer: Kemar Wilson
-Date Created: 27 October 2024
-"""
 import pygame
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -12,11 +8,14 @@ from enum import Enum
 BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
 
+ships = 0
+
 # Load background images for different game screens
 bg = pygame.image.load("images/bg.png")
 bg2 = pygame.image.load("images/bg2.png")
 bg3 = pygame.image.load("images/bg3.png")
 bg4 = pygame.image.load("images/bg4.png")
+bg5 = pygame.image.load("images/bg5.png")
 
 def create_surface_with_text(text, font_size, text_rgb, bg_rgb):
     """ 
@@ -129,6 +128,15 @@ def main():
         
         if game_state == GameState.HUMAN:
             game_state = human_mode(screen)  # Start human mode
+        
+        if game_state == GameState.EASYSHIPS:
+            game_state = human_mode(screen)  # Start AI easy mode
+        
+        if game_state == GameState.MEDIUMSHIPS:
+            game_state = human_mode(screen)  # Start AI medium mode
+        
+        if game_state == GameState.HARDSHIPS:
+            game_state = human_mode(screen)  # Start AI hard mode
 
         if game_state == GameState.QUIT:
             pygame.quit()  # Quit pygame and exit
@@ -237,7 +245,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="EASY",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+        action=GameState.EASYSHIPS,  # Action to enter human mode (for now, needs to be updated)
     )
     medium_btn = UIElement(
         center_position=(400, 380),
@@ -245,7 +253,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="MEDIUM",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+        action=GameState.MEDIUMSHIPS,  # Action to enter human mode (for now, needs to be updated)
     )
     hard_btn = UIElement(
         center_position=(400, 420),
@@ -253,7 +261,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="HARD",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+        action=GameState.HARDSHIPS,  # Action to enter human mode (for now, needs to be updated)
     )
     
     buttons = [easy_btn, medium_btn, hard_btn]  # Store difficulty buttons in a list
@@ -289,17 +297,69 @@ def human_mode(screen):
         action=GameState.NEWGAME,  # Action to return to the game mode
     )
     
+    button_1 = UIElement(
+        center_position=(300, 450),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="1",
+        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+    )
+    
+    button_2 = UIElement(
+        center_position=(350, 450),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="2",
+        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+    )
+    
+    button_3 = UIElement(
+        center_position=(400, 450),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="3",
+        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+    )
+    
+    button_4 = UIElement(
+        center_position=(450, 450),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="4",
+        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+    )
+    button_5 = UIElement(
+        center_position=(500, 450),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="5",
+        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
+    )
+    
+    buttons = [button_1, button_2, button_3, button_4, button_5]
+    
     while True:  # Main loop for human mode screen
         mouse_up = False
         for event in pygame.event.get():  # Check for events
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True  # Mouse button released
-        screen.blit(bg4, (0, 0))  # Draw background for human mode
+        screen.blit(bg5, (0, 0))  # Draw background for human mode
         
         ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)  # Update return button state
         if ui_action is not None:  # If the return button was clicked
             return ui_action  # Return the action associated with the button
         return_btn.draw(screen)  # Draw the return button
+        
+        for button in buttons:  # Update and draw each difficulty button
+            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)  # Update button state
+            if ui_action is not None:  # If a button was clicked
+                return ui_action  # Return the action associated with the button
+            button.draw(screen)  # Draw the button
         
         pygame.display.flip()  # Update the display
 
@@ -309,6 +369,9 @@ class GameState(Enum):
     NEWGAME = 1          # Enumeration for starting a new game
     AIMODE = 2           # Enumeration for AI mode
     HUMAN = 3            # Enumeration for human player mode
+    EASYSHIPS = 4
+    MEDIUMSHIPS = 5
+    HARDSHIPS = 6
     
 
 if __name__ == "__main__":
