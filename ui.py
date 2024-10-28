@@ -8,6 +8,9 @@ BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
 
 bg = pygame.image.load("images/bg.png")
+bg2 = pygame.image.load("images/bg2.png")
+bg3 = pygame.image.load("images/bg3.png")
+bg4 = pygame.image.load("images/bg4.png")
 
 def create_surface_with_text(text, font_size, text_rgb, bg_rgb):
     """ Returns surface with text written on """
@@ -85,7 +88,13 @@ def main():
             game_state = title_screen(screen)
 
         if game_state == GameState.NEWGAME:
-            game_state = play_level(screen)
+            game_state = game_mode(screen)
+            
+        if game_state == GameState.AIMODE:
+            game_state = ai_mode(screen)
+        
+        if game_state == GameState.HUMAN:
+            game_state = human_mode(screen)
 
         if game_state == GameState.QUIT:
             pygame.quit()
@@ -128,35 +137,143 @@ def title_screen(screen):
         pygame.display.flip()
 
 
-def play_level(screen):
+def game_mode(screen):
     return_btn = UIElement(
-        center_position=(140, 570),
+        center_position=(80, 570),
         font_size=20,
         bg_rgb=BLUE,
         text_rgb=WHITE,
-        text="Return to main menu",
+        text="RETURN",
         action=GameState.TITLE,
     )
+    
+    ai_btn = UIElement(
+        center_position=(400, 370),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="AI",
+        action=GameState.AIMODE,
+    )
+    human_btn = UIElement(
+        center_position=(400, 410),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="HUMAN",
+        action=GameState.HUMAN,
+    )
+
+    buttons = [ai_btn, human_btn]
+
 
     while True:
         mouse_up = False
         for event in pygame.event.get():
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True
-        screen.fill(BLUE)
+        screen.blit(bg2, (0, 0))
 
         ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
         if ui_action is not None:
             return ui_action
         return_btn.draw(screen)
+        
+        for button in buttons:
+            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
+            if ui_action is not None:
+                return ui_action
+            button.draw(screen)
 
         pygame.display.flip()
 
+def ai_mode(screen):
+    return_btn = UIElement(
+        center_position=(80, 570),
+        font_size=20,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="RETURN",
+        action=GameState.NEWGAME, 
+    )
+    
+    easy_btn = UIElement(
+        center_position=(400, 340),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="EASY",
+        action=GameState.HUMAN, #need to be update
+    )
+    medium_btn = UIElement(
+        center_position=(400, 380),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="MEDIUM",
+        action=GameState.HUMAN, #need to be update
+    )
+    hard_btn = UIElement(
+        center_position=(400, 420),
+        font_size=40,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="HARD",
+        action=GameState.HUMAN, #need to be update
+    )
+    
+    buttons = [easy_btn, medium_btn, hard_btn]
+    
+    while True:
+        mouse_up = False
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouse_up = True
+        screen.blit(bg3, (0, 0))
+        
+        ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if ui_action is not None:
+            return ui_action
+        return_btn.draw(screen)
+        
+        for button in buttons:
+            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
+            if ui_action is not None:
+                return ui_action
+            button.draw(screen)
+        
+        pygame.display.flip()
+
+def human_mode(screen):
+    return_btn = UIElement(
+        center_position=(80, 570),
+        font_size=20,
+        bg_rgb=BLUE,
+        text_rgb=WHITE,
+        text="RETURN",
+        action=GameState.NEWGAME, 
+    )
+    
+    while True:
+        mouse_up = False
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                mouse_up = True
+        screen.blit(bg4, (0, 0))
+        
+        ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if ui_action is not None:
+            return ui_action
+        return_btn.draw(screen)
+        
+        pygame.display.flip()
 
 class GameState(Enum):
     QUIT = -1
     TITLE = 0
     NEWGAME = 1
+    AIMODE = 2
+    HUMAN = 3
 
 
 if __name__ == "__main__":

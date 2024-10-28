@@ -27,6 +27,8 @@ class Game:
 
     def play(self):
         print("Welcome to Battleship!")
+        opponent_choice = input("Do you want to play against AI or a human? (AI/human): ").strip().lower()
+
         chosen_fleet = None
         while chosen_fleet is None:
             try:
@@ -39,7 +41,6 @@ class Game:
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
-        opponent_choice = input("Do you want to play against AI or a human? (AI/human): ").strip().lower()
         chosen_fleet_copy = chosen_fleet.copy()
 
         if opponent_choice == "AI" or "ai":
