@@ -1,3 +1,7 @@
+""" 
+Programmer: Kemar Wilson
+Date written: October 27, 2024
+"""
 import pygame
 import pygame.freetype
 from pygame.sprite import Sprite
