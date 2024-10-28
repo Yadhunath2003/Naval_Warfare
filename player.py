@@ -1,7 +1,6 @@
 '''
-Author: Isabel Loney
-Creation Date: September 11, 2024
-Last Modified: September 15, 2024
+Creation Date: 9/11/2024
+Last Modified: 9/15/2024
 Commenting: Provide prologue comments for each function specifying input, output, and a description, as well as any notes/TODOs
             Provide inline comments for sections of code within functions to clarify functionality and purpose. Written on 9/15/24
 Program Name: Battleship - player.py
