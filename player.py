@@ -1,5 +1,5 @@
 '''
-Author: Isabel Loney
+
 Creation Date: September 11, 2024
 Last Modified: September 15, 2024
 Commenting: Provide prologue comments for each function specifying input, output, and a description, as well as any notes/TODOs
