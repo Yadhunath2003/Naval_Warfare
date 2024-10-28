@@ -1,5 +1,4 @@
 '''
-Author: Anakha Krishna
 Creation Date: 9/10/24
 Last Modified: 9/15/24
 Commenting: All comments written on 9/15/24 by Anakha Krishna and Isabel Loney
