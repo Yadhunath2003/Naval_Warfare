@@ -352,7 +352,7 @@ def human_mode(screen):
         for event in pygame.event.get():  # Check for events
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True  # Mouse button released
-        screen.blit(bg5, (0, 0))  # Draw background for human mode
+        screen.blit(bg4, (0, 0))  # Draw background for human mode
         
         ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)  # Update return button state
         if ui_action is not None:  # If the return button was clicked
