@@ -13,7 +13,6 @@ Modified by Group 5: Added the Computer feature to the game
 from player import Player
 from ship import Ship
 from ai import AIPlayer  # Import AIPlayer which now handles all difficulties
-from shipplacement import main as shipplacement_main
 
 class Game:
     def __init__(self):
@@ -40,7 +39,6 @@ class Game:
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
-        shipplacement_main(self.fleet_type)
 
         opponent_choice = input("Do you want to play against AI or a human? (AI/human): ").strip().lower()
         chosen_fleet_copy = chosen_fleet.copy()
