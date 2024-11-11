@@ -61,7 +61,7 @@ def draw_ships(window, ships, cell_size, offset=(0, 0)): #DRAW SHIPS
 def create_game_logic(rows, cols): #LOGIC GRID
     return [[' ' for _ in range(cols)] for _ in range(rows)]
 
-def main():
+def main(chosen_ship_count):
     pygame.init()
     window_width = (COLS + 5) * CELL_SIZE
     window_height = (ROWS + 5) * CELL_SIZE
@@ -84,6 +84,8 @@ def main():
     # CHANGE IMAGE SIZES TO FIT
     ship_images = [pygame.transform.scale(img, (CELL_SIZE, CELL_SIZE)) for img in ship_images]
 
+    placed_ships = 0 
+    
     # SHIP INTIAL PLACEMENT, DRAG DROP
     ships = [
         Ship("Carrier", 5, "horizontal", (COLS + 1, i * 2), ship_images[i]) for i in range(5)
@@ -117,6 +119,11 @@ def main():
                     selected_ship.move((grid_x, grid_y))
                     if not selected_ship.is_within_bounds() or any(coord in ship.coordinates for ship in ships if ship != selected_ship for coord in selected_ship.coordinates):
                         selected_ship.move((COLS + 1, ships.index(selected_ship) * 2))  # RESET
+                    elif placed_ships < chosen_ship_count:
+                        placed_ships += 1  # Increment if placement is valid and within allowed number
+                    else:
+                        selected_ship.move((COLS + 1, ships.index(selected_ship) * 2))  # Reset if fleet size limit is reached
+        
                     selected_ship = None
                     dragging = False
             elif event.type == pygame.MOUSEMOTION and dragging and selected_ship:
@@ -135,4 +142,13 @@ def main():
         pygame.display.flip()
 
 if __name__ == "__main__":
-    main()
+    # Prompt the user for fleet size if running directly
+    try:
+        chosen_ship_count = int(input("Enter the number of ships to place (1-5): "))
+        if 1 <= chosen_ship_count <= 5:
+            main(chosen_ship_count)
+        else:
+            print("Please enter a number between 1 and 5.")
+    except ValueError:
+        print("Invalid input. Please enter a valid integer between 1 and 5.")
+
