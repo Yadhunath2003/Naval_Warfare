@@ -62,6 +62,10 @@ WHITE = (255, 255, 255)
 # Preconditions: 'bg.png' file exists in the 'images' directory.
 # Postconditions: Image is loaded as a background.
 bg = pygame.image.load("images/bg.png")
+bg2 = pygame.image.load("images/bg2.png")
+bg3 = pygame.image.load("images/bg3.png")
+bg4 = pygame.image.load("images/bg4.png")
+bg5 = pygame.image.load("images/bg5.png")
 
 def create_surface_with_text(text, font_size, text_rgb, bg_rgb=None):
     """ 
@@ -178,8 +182,8 @@ def main():
 
 def title_screen(screen):
     """ Displays the title screen with 'Start' and 'Quit' buttons. """
-    start_btn = UIElement(center_position=(400, 400), font_size=35, text_rgb=WHITE, text="Start", action=GameState.MODE_SELECTION, bg_rgb=None)
-    quit_btn = UIElement(center_position=(400, 440), font_size=35, text_rgb=WHITE, text="Quit", action=GameState.QUIT, bg_rgb=None)
+    start_btn = UIElement(center_position=(400, 400), font_size=25, text_rgb=WHITE, text="START", action=GameState.MODE_SELECTION, bg_rgb=None)
+    quit_btn = UIElement(center_position=(400, 440), font_size=25, text_rgb=WHITE, text="QUIT", action=GameState.QUIT, bg_rgb=None)
     buttons = [start_btn, quit_btn]
 
     while True:
@@ -204,9 +208,9 @@ def title_screen(screen):
 
 def mode_selection_screen(screen):
     """ Displays the mode selection screen with buttons for game modes. """
-    human_vs_human_btn = UIElement(center_position=(400, 300), font_size=30, text_rgb=WHITE, bg_rgb=BLUE, text="Human vs Human", action=GameState.NEWGAME)
-    human_vs_ai_btn = UIElement(center_position=(400, 350), font_size=30, text_rgb=WHITE, bg_rgb=BLUE, text="Human vs AI", action=GameState.NEWGAME)
-    back_btn = UIElement(center_position=(400, 400), font_size=30, text_rgb=WHITE, bg_rgb=BLUE, text="Back to Main Menu", action=GameState.TITLE)
+    human_vs_human_btn = UIElement(center_position=(410, 335), font_size=25, text_rgb=WHITE, text="HUMAN vs HUMAN", action=GameState.NEWGAME)
+    human_vs_ai_btn = UIElement(center_position=(410, 380), font_size=25, text_rgb=WHITE, text="HUMAN vs AI", action=GameState.NEWGAME)
+    back_btn = UIElement(center_position=(60, 570), font_size=20, text_rgb=WHITE, text="RETURN", action=GameState.TITLE)
     buttons = [human_vs_human_btn, human_vs_ai_btn, back_btn]
 
     while True:
@@ -217,7 +221,7 @@ def mode_selection_screen(screen):
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True
 
-        screen.blit(bg, (0, 0))
+        screen.blit(bg2, (0, 0))
 
         for button in buttons:
             ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
@@ -229,7 +233,7 @@ def mode_selection_screen(screen):
 
 def play_level(screen):
     """ Placeholder screen for gameplay with a 'Return to Main Menu' button. """
-    return_btn = UIElement(center_position=(140, 570), font_size=20, text_rgb=WHITE, bg_rgb=BLUE, text="Return to Main Menu", action=GameState.TITLE)
+    return_btn = UIElement(center_position=(60, 570), font_size=20, text_rgb=WHITE, bg_rgb=BLUE, text="Return", action=GameState.MODE_SELECTION)
 
     while True:
         mouse_up = False

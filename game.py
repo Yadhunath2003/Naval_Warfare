@@ -39,6 +39,7 @@ class Game:
             except ValueError:
                 print("Invalid input. Please enter a number.")
 
+
         opponent_choice = input("Do you want to play against AI or a human? (AI/human): ").strip().lower()
         chosen_fleet_copy = chosen_fleet.copy()
 

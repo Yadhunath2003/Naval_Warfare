@@ -7,6 +7,9 @@ import pygame.freetype
 from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
+import sys
+
+from shipplacement import Ship, draw_grid, draw_ships, create_game_logic, ROWS, COLS, CELL_SIZE
 
 # Define color constants for UI elements
 BLUE = (106, 159, 181)
@@ -366,6 +369,7 @@ def human_mode(screen):
             button.draw(screen)  # Draw the button
         
         pygame.display.flip()  # Update the display
+    
 
 class GameState(Enum):
     QUIT = -1            # Enumeration for quitting the game
