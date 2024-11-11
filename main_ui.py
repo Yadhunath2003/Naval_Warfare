@@ -7,6 +7,9 @@ import pygame.freetype
 from pygame.sprite import Sprite
 from pygame.rect import Rect
 from enum import Enum
+import sys
+
+from shipplacement import Ship, draw_grid, draw_ships, create_game_logic, ROWS, COLS, CELL_SIZE
 
 # Define color constants for UI elements
 BLUE = (106, 159, 181)
@@ -359,13 +362,101 @@ def human_mode(screen):
             return ui_action  # Return the action associated with the button
         return_btn.draw(screen)  # Draw the return button
         
-        for button in buttons:  # Update and draw each difficulty button
-            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)  # Update button state
-            if ui_action is not None:  # If a button was clicked
-                return ui_action  # Return the action associated with the button
-            button.draw(screen)  # Draw the button
+        for button in ship_buttons:
+            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
+            if ui_action is not None:
+                # Proceed to ship placement screen with selected ship count
+                return ship_placement_screen(screen, "Human", ui_action)
+            button.draw(screen)
         
         pygame.display.flip()  # Update the display
+
+def ship_placement_screen(screen, difficulty):
+    """ Screen where the player places their ships before the game starts. """
+    # Load ship images
+    ship_images = [
+        pygame.image.load("images/ship.png").convert_alpha(),
+        pygame.image.load("images/ship.png").convert_alpha(),
+        pygame.image.load("images/ship.png").convert_alpha(),
+        pygame.image.load("images/ship.png").convert_alpha(),
+        pygame.image.load("images/ship.png").convert_alpha()
+    ]
+    # Resize images to fit cell size
+    ship_images = [pygame.image.load("images/ship.png").convert_alpha() for _ in range(num_ships)]
+    ship_images = [pygame.transform.scale(img, (CELL_SIZE, CELL_SIZE)) for img in ship_images]
+
+    ships = [
+        Ship(f"Ship{i+1}", random.randint(2, 5), "horizontal", (COLS + 1, i * 2), ship_images[i])
+        for i in range(num_ships)
+    ]
+
+    selected_ship = None
+    dragging = False
+
+    while True:
+        mouse_up = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                for ship in ships:
+                    ship_rect = pygame.Rect(
+                        ship.position[0] * CELL_SIZE, ship.position[1] * CELL_SIZE,
+                        CELL_SIZE * ship.length if ship.orientation == 'horizontal' else CELL_SIZE,
+                        CELL_SIZE if ship.orientation == 'horizontal' else CELL_SIZE * ship.length
+                    )
+                    if ship_rect.collidepoint(mouse_x, mouse_y):
+                        selected_ship = ship
+                        dragging = True
+                        break
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if dragging and selected_ship:
+                    mouse_x, mouse_y = pygame.mouse.get_pos()
+                    grid_x = (mouse_x - CELL_SIZE) // CELL_SIZE
+                    grid_y = (mouse_y - CELL_SIZE) // CELL_SIZE
+                    selected_ship.move((grid_x, grid_y))
+                    if not selected_ship.is_within_bounds() or any(
+                        coord in other_ship.coordinates
+                        for other_ship in ships if other_ship != selected_ship
+                        for coord in selected_ship.coordinates
+                    ):
+                        selected_ship.move((COLS + 1, ships.index(selected_ship) * 2))
+                    selected_ship = None
+                    dragging = False
+            elif event.type == pygame.MOUSEMOTION and dragging and selected_ship:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                grid_x = (mouse_x - CELL_SIZE) // CELL_SIZE
+                grid_y = (mouse_y - CELL_SIZE) // CELL_SIZE
+                selected_ship.move((grid_x, grid_y))
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r and selected_ship:
+                    selected_ship.rotate()
+
+        screen.blit(bg5, (0, 0))
+        draw_grid(screen, ROWS, COLS, CELL_SIZE, offset=(CELL_SIZE, CELL_SIZE))
+        draw_ships(screen, ships, CELL_SIZE, offset=(CELL_SIZE, CELL_SIZE))
+
+        confirm_btn = UIElement(
+            center_position=(400, 550),
+            font_size=30,
+            bg_rgb=BLUE,
+            text_rgb=WHITE,
+            text="Confirm Placement",
+            action="CONFIRM_PLACEMENT",
+        )
+
+        mouse_up = pygame.mouse.get_pressed()[0] == 0
+        ui_action = confirm_btn.update(pygame.mouse.get_pos(), mouse_up)
+        if ui_action == "CONFIRM_PLACEMENT":
+            all_placed = all(ship.is_within_bounds() for ship in ships)
+            if all_placed:
+                return game_loop(screen, ships, difficulty)
+
+        confirm_btn.draw(screen)
+        pygame.display.flip()
+    
 
 class GameState(Enum):
     QUIT = -1            # Enumeration for quitting the game

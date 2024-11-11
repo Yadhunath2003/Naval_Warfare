@@ -1,3 +1,6 @@
+"""WE ARE NOT USING THIS FOR THE TIME BEING, MAIN_UI.PY FILE IS THE ONE TO RUN."""
+
+
 import pygame
 import sys
 from ui import UIElement, BLUE, WHITE, bg, bg2, bg3, bg4, bg5
