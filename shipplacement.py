@@ -1,7 +1,7 @@
 import pygame
 import sys
 
-# GRID SETTINGS
+# GRID SET
 ROWS, COLS = 10, 10
 CELL_SIZE = 40
 GRID_COLOR = (255, 255, 255)
@@ -66,21 +66,9 @@ def main():
     window_width = (COLS + 5) * CELL_SIZE
     window_height = (ROWS + 5) * CELL_SIZE
     window = pygame.display.set_mode((window_width, window_height), pygame.SRCALPHA)
-    pygame.display.set_caption('Place Ships')
+    pygame.display.set_caption('Naval Warfare')
 
-    # Prompt user for the number of ships (1-5)
-    try:
-        max_ships = int(input("Enter the number of ships to place (1-5): "))
-        if not 1 <= max_ships <= 5:
-            print("Please enter a number between 1 and 5.")
-            pygame.quit()
-            return
-    except ValueError:
-        print("Invalid input. Please enter a valid integer between 1 and 5.")
-        pygame.quit()
-        return
-
-    # Background and ship image setup
+    # BACKGROUND SPRITE IMAGE
     background_image = pygame.image.load("images/bg4.png").convert()
     background_image = pygame.transform.scale(background_image, (window_width, window_height))
 
@@ -107,7 +95,7 @@ def main():
     # GAME LOOP
     running = True
     while running:
-        window.blit(background_image, (0, 0))  # Draw background
+        window.blit(background_image, (0, 0))  # BACKGROUND
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -140,7 +128,7 @@ def main():
                 if event.key == pygame.K_r and selected_ship:
                     selected_ship.rotate()
 
-        # Draw grid and ships
+        # DRAW
         draw_grid(window, ROWS, COLS, CELL_SIZE, offset=(CELL_SIZE, CELL_SIZE))
         draw_ships(window, ships, CELL_SIZE)
 
