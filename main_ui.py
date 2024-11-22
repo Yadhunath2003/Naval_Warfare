@@ -2,6 +2,7 @@
 Programmer: Kemar Wilson
 Date written: October 27, 2024
 """
+import random
 import pygame
 import pygame.freetype
 from pygame.sprite import Sprite
@@ -14,6 +15,10 @@ from shipplacement import Ship, draw_grid, draw_ships, create_game_logic, ROWS, 
 # Define color constants for UI elements
 BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
+RED = (255, 0, 0)    # Color for a hit
+GREEN = (0, 255, 0)  # Color for a miss
+CELL_SIZE = 30  # Smaller cell size for better grid alignment
+
 
 ships = 0
 
@@ -23,6 +28,36 @@ bg2 = pygame.image.load("images/bg2.png")
 bg3 = pygame.image.load("images/bg3.png")
 bg4 = pygame.image.load("images/bg4.png")
 bg5 = pygame.image.load("images/bg5.png")
+
+def display_text(screen, text, position, font_size=24, color=WHITE):
+    """
+    Renders text onto the Pygame screen.
+
+    Args:
+        screen: Pygame screen to render the text on.
+        text: The string to display.
+        position: Tuple (x, y) for the text position.
+        font_size: Font size for the text.
+        color: Color of the text.
+    """
+    font = pygame.font.SysFont("Courier", font_size)
+    text_surface = font.render(text, True, color)
+    screen.blit(text_surface, position)
+
+def transition_popup(screen, message, duration=3000):
+    """
+    Displays a transition popup message for a brief duration.
+
+    Args:
+        screen: Pygame screen to render the message.
+        message: The text to display.
+        duration: Duration in milliseconds to display the popup.
+    """
+    screen.fill(BLUE)
+    display_text(screen, message, (300, 300), font_size=36)
+    pygame.display.flip()
+    pygame.time.wait(duration)
+
 
 def create_surface_with_text(text, font_size, text_rgb, bg_rgb):
     """ 
@@ -120,7 +155,8 @@ def main():
     """ Main function to initialize pygame and manage game states. """
     pygame.init()  # Initialize all imported pygame modules
 
-    screen = pygame.display.set_mode((800, 600))  # Set the display window size
+    screen = pygame.display.set_mode((1000, 700))  # Wider window
+  # Set the display window size
     game_state = GameState.TITLE  # Initialize the game state to TITLE
 
     while True:  # Main game loop
@@ -134,8 +170,10 @@ def main():
             game_state = ai_mode(screen)  # Start AI mode
         
         if game_state == GameState.HUMAN:
-            game_state = human_mode(screen)  # Start human mode
-        
+            # Call the human_mode function and return to TITLE after it ends
+            human_mode(screen)
+            game_state = GameState.TITLE  # Return to title screen after the game ends
+
         if game_state == GameState.EASYSHIPS:
             game_state = human_mode(screen)  # Start AI easy mode
         
@@ -148,6 +186,7 @@ def main():
         if game_state == GameState.QUIT:
             pygame.quit()  # Quit pygame and exit
             return
+
 
 def title_screen(screen):
     """ Display the title screen with start and quit buttons. """
@@ -294,82 +333,161 @@ def ai_mode(screen):
         pygame.display.flip()  # Update the display
 
 def human_mode(screen):
-    """ Display the human player options with a return button. """
-    return_btn = UIElement(
-        center_position=(80, 570),
-        font_size=20,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="RETURN",
-        action=GameState.NEWGAME,  # Action to return to the game mode
-    )
-    
-    button_1 = UIElement(
-        center_position=(300, 450),
-        font_size=40,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="1",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
-    )
-    
-    button_2 = UIElement(
-        center_position=(350, 450),
-        font_size=40,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="2",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
-    )
-    
-    button_3 = UIElement(
-        center_position=(400, 450),
-        font_size=40,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="3",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
-    )
-    
-    button_4 = UIElement(
-        center_position=(450, 450),
-        font_size=40,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="4",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
-    )
-    button_5 = UIElement(
-        center_position=(500, 450),
-        font_size=40,
-        bg_rgb=BLUE,
-        text_rgb=WHITE,
-        text="5",
-        action=GameState.HUMAN,  # Action to enter human mode (for now, needs to be updated)
-    )
-    
-    buttons = [button_1, button_2, button_3, button_4, button_5]
-    
-    while True:  # Main loop for human mode screen
-        mouse_up = False
-        for event in pygame.event.get():  # Check for events
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                mouse_up = True  # Mouse button released
-        screen.blit(bg4, (0, 0))  # Draw background for human mode
-        
-        ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)  # Update return button state
-        if ui_action is not None:  # If the return button was clicked
-            return ui_action  # Return the action associated with the button
-        return_btn.draw(screen)  # Draw the return button
-        
-        for button in buttons:  # Update and draw each difficulty button
-            ui_action = button.update(pygame.mouse.get_pos(), mouse_up)  # Update button state
-            if ui_action is not None:  # If a button was clicked
-                return ui_action  # Return the action associated with the button
-            button.draw(screen)  # Draw the button
-        
-        pygame.display.flip()  # Update the display
-    
+    """
+    Manages the game loop for human vs. human mode.
+    """
+
+    # Initialize grids and scores
+    player1_grid = create_game_logic(ROWS, COLS)
+    player2_grid = create_game_logic(ROWS, COLS)
+    player1_score = [0, 0]  # [Hits, Misses]
+    player2_score = [0, 0]  # [Hits, Misses]
+
+    # Randomly place ships for demonstration purposes
+    for _ in range(5):
+        player1_grid[random.randint(0, ROWS - 1)][random.randint(0, COLS - 1)] = 1
+        player2_grid[random.randint(0, ROWS - 1)][random.randint(0, COLS - 1)] = 1
+
+    current_player = 1  # Player 1 starts the game
+    print(f"Current player: {current_player}")
+
+    while True:
+        if current_player == 1:
+            # Player 1 attacks Player 2
+            attack_page(screen, player1_grid, player2_grid, player1_score, player2_score, current_player)
+            # Check if Player 1 wins
+            if all(cell != 1 for row in player2_grid for cell in row):
+                transition_popup(screen, "Player 1 Wins!", 3000)
+                break
+            # Transition to Player 2's turn
+            transition_popup(screen, "Player 2's Turn")
+            current_player = 2
+        else:
+            # Player 2 attacks Player 1
+            attack_page(screen, player2_grid, player1_grid, player2_score, player1_score, current_player)
+            # Check if Player 2 wins
+            if all(cell != 1 for row in player1_grid for cell in row):
+                transition_popup(screen, "Player 2 Wins!", 3000)
+                break
+            # Transition to Player 1's turn
+            transition_popup(screen, "Player 1's Turn")
+            current_player = 1
+
+
+
+def attack_page(screen, player_grid, opponent_grid, player_score, opponent_score, current_player):
+    GRID_WIDTH = COLS * CELL_SIZE
+    GRID_HEIGHT = ROWS * CELL_SIZE
+    screen_width = 800
+    spacing = 50
+
+    player_grid_offset = (spacing, spacing)
+    opponent_grid_offset = (screen_width - GRID_WIDTH - 2 * spacing, spacing)
+
+    running = True
+    text_message = ""
+
+    while running:
+        screen.fill(BLUE)
+
+        # Debug: Highlight grid areas
+        pygame.draw.rect(
+            screen, (255, 255, 255),  # White border
+            (opponent_grid_offset[0], opponent_grid_offset[1], GRID_WIDTH, GRID_HEIGHT), 2
+        )
+        pygame.draw.rect(
+            screen, (255, 255, 255),  # White border
+            (player_grid_offset[0], player_grid_offset[1], GRID_WIDTH, GRID_HEIGHT), 2
+        )
+
+        # Draw Player Grid
+        draw_grid(screen, ROWS, COLS, CELL_SIZE, offset=player_grid_offset)
+        for x in range(ROWS):
+            for y in range(COLS):
+                if player_grid[x][y] == 1:
+                    pygame.draw.rect(
+                        screen, (0, 0, 255),
+                        (player_grid_offset[0] + y * CELL_SIZE, player_grid_offset[1] + x * CELL_SIZE, CELL_SIZE, CELL_SIZE)
+                    )
+                elif player_grid[x][y] == 2:
+                    pygame.draw.circle(
+                        screen, GREEN,
+                        (player_grid_offset[0] + y * CELL_SIZE + CELL_SIZE // 2,
+                         player_grid_offset[1] + x * CELL_SIZE + CELL_SIZE // 2),
+                        10
+                    )
+                elif player_grid[x][y] == 3:
+                    pygame.draw.circle(
+                        screen, RED,
+                        (player_grid_offset[0] + y * CELL_SIZE + CELL_SIZE // 2,
+                         player_grid_offset[1] + x * CELL_SIZE + CELL_SIZE // 2),
+                        10
+                    )
+
+        # Draw Opponent Grid
+        draw_grid(screen, ROWS, COLS, CELL_SIZE, offset=opponent_grid_offset)
+        for x in range(ROWS):
+            for y in range(COLS):
+                if opponent_grid[x][y] == 2:  # Miss
+                    pygame.draw.circle(
+                        screen, GREEN,
+                        (opponent_grid_offset[0] + y * CELL_SIZE + CELL_SIZE // 2,
+                         opponent_grid_offset[1] + x * CELL_SIZE + CELL_SIZE // 2),
+                        10
+                    )
+                elif opponent_grid[x][y] == 3:  # Hit
+                    pygame.draw.circle(
+                        screen, RED,
+                        (opponent_grid_offset[0] + y * CELL_SIZE + CELL_SIZE // 2,
+                         opponent_grid_offset[1] + x * CELL_SIZE + CELL_SIZE // 2),
+                        10
+                    )
+
+        # Display grids and messages
+        display_text(screen, "Your Base", (player_grid_offset[0] + GRID_WIDTH // 2 - 50, 20))
+        display_text(screen, "Opponent Base", (opponent_grid_offset[0] + GRID_WIDTH // 2 - 50, 20))
+        if text_message:
+            display_text(screen, text_message, (screen_width // 2 - 100, GRID_HEIGHT + 100), font_size=24)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                x, y = pygame.mouse.get_pos()
+                grid_x = (x - opponent_grid_offset[0]) // CELL_SIZE
+                grid_y = (y - opponent_grid_offset[1]) // CELL_SIZE
+
+                print(f"Mouse clicked at: ({x}, {y}) -> Grid position: ({grid_x}, {grid_y})")
+
+                if 0 <= grid_x < COLS and 0 <= grid_y < ROWS:
+                    if opponent_grid[grid_y][grid_x] == 0:  # Miss
+                        opponent_grid[grid_y][grid_x] = 2
+                        player_score[1] += 1
+                        text_message = "Miss!"
+                    elif opponent_grid[grid_y][grid_x] == 1:  # Hit
+                        opponent_grid[grid_y][grid_x] = 3
+                        player_score[0] += 1
+                        text_message = "Hit!"
+                    print(f"Updated opponent_grid: {opponent_grid}")
+                    pygame.time.wait(1000)  # Pause for clarity
+                    running = False
+                else:
+                    text_message = "Click inside the opponent's grid!"
+
+        if all(cell != 1 for row in opponent_grid for cell in row):
+            display_text(screen, f"Player {current_player} Wins!", (300, 300), font_size=36, color=RED)
+            pygame.display.flip()
+            pygame.time.wait(3000)
+            running = False
+
+
+
+
+
+
 
 class GameState(Enum):
     QUIT = -1            # Enumeration for quitting the game
