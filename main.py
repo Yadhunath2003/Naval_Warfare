@@ -24,7 +24,7 @@ def main():
 
             if selected_boats > 0:  # Ensure the user selects a valid number of boats
                 # Step 2: Transition to the ship placement page
-                ship_placement_main(selected_boats)
+                ship_placement_main()
 
                 # Once ship placement is done, return to title or proceed further
                 game_state = GameState.TITLE  # Placeholder: Redirect to title after placement
