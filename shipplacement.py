@@ -91,6 +91,41 @@ def create_game_logic(rows, cols):
     """
     return [[' ' for _ in range(cols)] for _ in range(rows)]
 
+def ship_placement_complete(screen):
+    """
+    Handles the Confirm and Play buttons after ship placement.
+    """
+    font = pygame.font.Font(None, 36)
+    play_button = pygame.Rect(600, 500, 150, 50)
+    confirm_button = pygame.Rect(400, 500, 150, 50)
+
+    running = True
+    while running:
+        screen.fill((0, 0, 0))  # Clear the screen
+        pygame.draw.rect(screen, (0, 255, 0), play_button)  # Draw Play button
+        pygame.draw.rect(screen, (0, 255, 0), confirm_button)  # Draw Confirm button
+
+        # Add text to the buttons
+        play_text = font.render("Play", True, (0, 0, 0))
+        confirm_text = font.render("Confirm", True, (0, 0, 0))
+        screen.blit(play_text, (play_button.x + 35, play_button.y + 10))
+        screen.blit(confirm_text, (confirm_button.x + 20, confirm_button.y + 10))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if play_button.collidepoint(event.pos):
+                    print("Play button clicked!")  # Debugging log
+                    running = False  # Exit the loop after Play is clicked
+                    return True  # Proceed to gameplay
+                elif confirm_button.collidepoint(event.pos):
+                    print("Confirm button clicked!")  # Debugging log
+
+        pygame.display.flip()  # Update the display
+
+
 def main():
     pygame.init()
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -242,3 +277,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
