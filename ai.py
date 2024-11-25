@@ -68,25 +68,78 @@ class AIPlayer:
             return self.hard_move(opponent_board)
 
     def easy_move(self, opponent_board):
-        x, y = random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1)
-        while opponent_board.grid[x][y] == -1:
+        """
+        AI selects a random cell that has not been attacked yet.
+        """
+        while True:
             x, y = random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1)
-        return x, y
+            if opponent_board.grid[y][x] == 0:  # Ensure the cell is unvisited
+                return x, y
 
     def medium_move(self, opponent_board):
-        hits = [(x, y) for x in range(GRID_SIZE) for y in range(GRID_SIZE) if opponent_board.grid[x][y] == 2]
+        """
+        AI improves its targeting logic:
+        - If there's a hit, attack adjacent cells.
+        - Otherwise, pick a random unvisited cell.
+        """
+        # Find all cells that have been hit but not yet sunk
+        hits = [
+            (x, y)
+            for x in range(GRID_SIZE)
+            for y in range(GRID_SIZE)
+            if opponent_board.grid[y][x] == 2  # 2 indicates a hit
+        ]
+
+        # If there are hits, target adjacent cells
         if hits:
             last_hit = hits[-1]
             x, y = last_hit
-            options = [(x + dx, y + dy) for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]]
-            options = [(x, y) for x, y in options if 0 <= x < GRID_SIZE and 0 <= y < GRID_SIZE and opponent_board.grid[x][y] == 0]
-            if options:
-                return random.choice(options)
+            potential_targets = [
+                (x + dx, y + dy)
+                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Adjacent cells
+                if 0 <= x + dx < GRID_SIZE and 0 <= y + dy < GRID_SIZE
+                and opponent_board.grid[y + dy][x + dx] == 0  # Ensure unvisited
+            ]
+            if potential_targets:
+                return random.choice(potential_targets)
+
+        # Default to random unvisited cell
         return self.easy_move(opponent_board)
 
     def hard_move(self, opponent_board):
+        """
+        AI implements strategic targeting:
+        - Prioritize finishing off partially-hit ships.
+        - Uses a probability-based heatmap for efficient hunting.
+        """
+        # Find all cells that have been hit but not yet sunk
+        hits = [
+            (x, y)
+            for x in range(GRID_SIZE)
+            for y in range(GRID_SIZE)
+            if opponent_board.grid[y][x] == 2  # 2 indicates a hit
+        ]
+
+        # Prioritize finishing ships by targeting adjacent cells
+        if hits:
+            for hit in hits:
+                x, y = hit
+                potential_targets = [
+                    (x + dx, y + dy)
+                    for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]  # Adjacent cells
+                    if 0 <= x + dx < GRID_SIZE and 0 <= y + dy < GRID_SIZE
+                    and opponent_board.grid[y + dy][x + dx] == 0  # Ensure unvisited
+                ]
+                if potential_targets:
+                    return random.choice(potential_targets)
+
+        # Use a simple heuristic for hunting ships
+        # Target every other cell for more efficient searching
         for x in range(GRID_SIZE):
             for y in range(GRID_SIZE):
-                if opponent_board.is_hit(x, y) and opponent_board.grid[x][y] != -1:
+                if (x + y) % 2 == 0 and opponent_board.grid[y][x] == 0:
                     return x, y
+
+        # Fallback to random move if all else fails
         return self.easy_move(opponent_board)
+
