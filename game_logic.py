@@ -1,4 +1,3 @@
-
 import random
 
 class GameBoard:
@@ -53,6 +52,28 @@ class GameBoard:
         })
         return True
 
+    def attack(self, x, y):
+        """
+        Process an attack on the board.
+        - Returns True if it's a hit.
+        - Returns False if it's a miss.
+        """
+        if self.grid[y][x] == -1 or self.grid[y][x] == 2:
+            # Already attacked
+            print(f"Location ({x}, {y}) was already attacked!")
+            return False
+
+        if self.grid[y][x] > 0:
+            # It's a hit
+            self.grid[y][x] = 2
+            print(f"Hit at ({x}, {y})!")
+            return True
+        else:
+            # It's a miss
+            self.grid[y][x] = -1
+            print(f"Miss at ({x}, {y}).")
+            return False
+
     def randomly_place_ships(self, ship_lengths):
         """
         Randomly place multiple ships on the grid.
@@ -96,3 +117,4 @@ if __name__ == "__main__":
     print("Ships:")
     for ship in board.ships:
         print(ship)
+
