@@ -2,6 +2,7 @@ import pygame
 from game_logic import GameBoard
 import sys
 from game_state import select_number_of_boats
+from player import Player
 
 # Constants
 ROWS, COLS = 10, 10
@@ -91,17 +92,17 @@ def create_game_logic(rows, cols):
     """
     return [[' ' for _ in range(cols)] for _ in range(rows)]
 
-def main():
+def main(player, selected_boats, is_player1=True):
     pygame.init()
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
-    pygame.display.set_caption('Naval Warfare - Ship Placement')
+    pygame.display.set_caption(f"{player.name}'s Ship Placement")
 
     # Background Image
     background_image = pygame.image.load("images/bg4.png").convert()
     background_image = pygame.transform.scale(background_image, (WINDOW_WIDTH, WINDOW_HEIGHT))
 
-    # Initialize the game board
-    board = GameBoard(ROWS, COLS)
+    # Initialize Player's Board
+    board = player.board
 
     # Ship Images
     ship_image = pygame.image.load("images/ship.png").convert_alpha()
@@ -109,31 +110,28 @@ def main():
 
     # Placeholder Text for Player
     font = pygame.font.Font(None, 36)
-    player_text = "Player 1's base"
 
-    # Confirm and Play Buttons
+    # Buttons
     button_font = pygame.font.Font(None, 28)
     confirm_button = pygame.Rect(WINDOW_WIDTH - 300, WINDOW_HEIGHT - 50, 120, 40)
+    next_button = pygame.Rect(WINDOW_WIDTH - 300, WINDOW_HEIGHT - 100, 120, 40)
     play_button = pygame.Rect(WINDOW_WIDTH - 150, WINDOW_HEIGHT - 50, 120, 40)
-    play_button_active = False
 
-    # Get the number of ships to place from user selection
-    selected_boats = select_number_of_boats(window)  # Get number of boats from the game state
-    print(f"Selected number of boats: {selected_boats}")
-
-    # Ship Placement Initialization with Different Sizes
+    # Initialize Ship Placement
     ships = [
         Ship(5, "horizontal", (COLS + 1, 0), ship_image),
         Ship(4, "horizontal", (COLS + 1, 2), ship_image),
         Ship(3, "horizontal", (COLS + 1, 4), ship_image),
         Ship(2, "horizontal", (COLS + 1, 6), ship_image),
-        Ship(1, "horizontal", (COLS + 1, 8), ship_image)
+        Ship(1, "horizontal", (COLS + 1, 8), ship_image),
     ]
+
     boats_placed = 0
     selected_ship = None
     dragging = False
-
-    board.display_grid()
+    confirm_active = False
+    next_active = False
+    play_button_active = False
 
     # Game Loop
     running = True
@@ -141,6 +139,7 @@ def main():
         window.blit(background_image, (0, 0))  # Draw Background
 
         # Draw Player Placeholder Text
+        player_text = f"{player.name}'s base"
         text_surface = font.render(player_text, True, BLACK)
         text_rect = text_surface.get_rect(center=(WINDOW_WIDTH // 2, 20))
         window.blit(text_surface, text_rect)
@@ -152,13 +151,14 @@ def main():
         draw_ships(window, ships, CELL_SIZE)
 
         # Draw Confirm Button
-        pygame.draw.rect(
-            window,
-            GREEN if boats_placed == selected_boats else LIGHT_GREY,
-            confirm_button
-        )
+        pygame.draw.rect(window, GREEN if boats_placed == selected_boats else LIGHT_GREY, confirm_button)
         confirm_text = button_font.render("Confirm", True, BLACK)
         window.blit(confirm_text, (confirm_button.x + 20, confirm_button.y + 10))
+
+        # Draw Next Button
+        pygame.draw.rect(window, GREEN if next_active else LIGHT_GREY, next_button)
+        next_text = button_font.render("Next", True, BLACK if next_active else (150, 150, 150))
+        window.blit(next_text, (next_button.x + 20, next_button.y + 10))
 
         # Draw Play Button
         pygame.draw.rect(window, GREEN if play_button_active else LIGHT_GREY, play_button)
@@ -170,50 +170,61 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                if confirm_button.collidepoint(mouse_x, mouse_y):
-                    # Confirm Button Clicked
-                    if boats_placed == selected_boats:
-                        for ship in ships:
-                            board.place_ship(
-                                ship.length,
-                                ship.orientation,
-                                ship.position
-                            )
-                        board.display_ship_placements()
-                        play_button_active = True
-                        print("All boats placed!")
+
+                # Confirm Button Logic
+                if confirm_button.collidepoint(mouse_x, mouse_y) and boats_placed == selected_boats:
+                    for ship in ships:
+                        valid = board.place_ship(ship.length, ship.orientation, ship.position)
+                        if not valid:
+                            print(f"Invalid placement for ship {ship.length}.")
+                            break
+                    print(f"{player.name} confirmed their ship placement.")
+                    confirm_active = False
+                    if is_player1:
+                        next_active = True  # Enable Next for Player 1
                     else:
-                        print(f"Please place exactly {selected_boats} boats!")
-                elif play_button_active and play_button.collidepoint(mouse_x, mouse_y):
-                    # Play Button Clicked
-                    print("Starting the game!")  # Placeholder for transitioning to gameplay
+                        play_button_active = True  # Enable Play for Player 2
+                    # Display updated board
+                    board.display_ship_placements()
+
+                # Next Button Logic
+                elif next_button.collidepoint(mouse_x, mouse_y) and next_active:
+                    print("Transitioning to Player 2's base...")
+                    running = False  # Exit for Player 2's placement
+
+                # Play Button Logic
+                elif play_button.collidepoint(mouse_x, mouse_y) and play_button_active:
+                    print("Starting the game!")  # Transition to gameplay
+                    running = False
                 else:
-                    # Check if a ship is clicked
+                    # Check if a ship is clicked for dragging
                     for ship in ships:
                         ship_rect = pygame.Rect(
                             ship.position[0] * CELL_SIZE, ship.position[1] * CELL_SIZE,
                             CELL_SIZE * ship.length if ship.orientation == 'horizontal' else CELL_SIZE,
-                            CELL_SIZE if ship.orientation == 'horizontal' else CELL_SIZE * ship.length
+                            CELL_SIZE if ship.orientation == 'horizontal' else CELL_SIZE * ship.length,
                         )
                         if ship_rect.collidepoint(mouse_x, mouse_y):
-                            if boats_placed < selected_boats or ship.selected:
-                                selected_ship = ship
-                                dragging = True
-                                break
+                            selected_ship = ship
+                            dragging = True
+                            break
 
-            #When the ships are placed.                
             elif event.type == pygame.MOUSEBUTTONUP:
                 if dragging and selected_ship:
                     mouse_x, mouse_y = pygame.mouse.get_pos()
                     grid_x = min(max(mouse_x // CELL_SIZE, 0), COLS - (1 if selected_ship.orientation == 'horizontal' else selected_ship.length))
                     grid_y = min(max(mouse_y // CELL_SIZE, 0), ROWS - (selected_ship.length if selected_ship.orientation == 'vertical' else 1))
+                     # Try placing the ship in its new position
                     previous_coordinates = selected_ship.coordinates.copy()
 
                     selected_ship.move((grid_x, grid_y))
+
+                    # Check if placement is invalid (out of bounds or overlapping)
                     if not selected_ship.is_within_bounds() or any(
-                            coord in other_ship.coordinates for other_ship in ships if other_ship != selected_ship for coord in selected_ship.coordinates):
+                        coord in other_ship.coordinates for other_ship in ships if other_ship != selected_ship for coord in selected_ship.coordinates):
                         # Reset ship if out of bounds or overlapping
                         selected_ship.move((COLS + 1, ships.index(selected_ship) * 2))
 
@@ -221,24 +232,25 @@ def main():
                     selected_ship = None
                     dragging = False
 
-                # Dynamically calculate boats_placed based on valid ship positions.
+                # Dynamically calculate boats_placed
                 boats_placed = sum(
-                    all(0 <= x < COLS and 0 <= y < ROWS for x, y in ship.coordinates) and
-                    not any(coord in other_ship.coordinates for other_ship in ships if other_ship != ship for coord in ship.coordinates)
+                    all(0 <= x < COLS and 0 <= y < ROWS for x, y in ship.coordinates)
                     for ship in ships
                 )
+                confirm_active = boats_placed == selected_boats
 
-            #When the ships are in motion to be placed.        
             elif event.type == pygame.MOUSEMOTION and dragging and selected_ship:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
                 grid_x = min(max(mouse_x // CELL_SIZE, 0), COLS - (1 if selected_ship.orientation == 'horizontal' else selected_ship.length))
                 grid_y = min(max(mouse_y // CELL_SIZE, 0), ROWS - (selected_ship.length if selected_ship.orientation == 'vertical' else 1))
                 selected_ship.move((grid_x, grid_y))
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and selected_ship:
                     selected_ship.rotate()
 
         pygame.display.flip()
+
 
 if __name__ == "__main__":
     main()

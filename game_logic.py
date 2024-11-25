@@ -89,7 +89,7 @@ class GameBoard:
 # Example Usage
 if __name__ == "__main__":
     board = GameBoard()
-    ship_lengths = [5, 4, 3, 3, 2]
+    ship_lengths = [5, 4, 3, 2, 1]
     board.randomly_place_ships(ship_lengths)
     board.display_grid()
 
