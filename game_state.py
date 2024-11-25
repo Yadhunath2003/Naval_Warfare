@@ -6,6 +6,7 @@ from ui import UIElement  # Import the button class
 # Define color constants for UI elements
 BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
+global ships_selected
 
 # Load background images for different game screens
 bg = pygame.image.load("images/bg.png")
@@ -210,7 +211,8 @@ def human_mode(screen):
         pygame.display.flip()
 
 def select_number_of_boats(screen):
-    """ Display the screen to select the number of boats. """
+    """Display the screen to select the number of boats and record the selection."""
+    # Define the return button
     return_btn = UIElement(
         center_position=(80, 570),
         font_size=20,
@@ -220,6 +222,7 @@ def select_number_of_boats(screen):
         action=GameState.NEWGAME,
     )
 
+    # Define buttons for selecting the number of boats
     buttons = [
         UIElement(
             center_position=(300 + i * 50, 450),
@@ -232,6 +235,9 @@ def select_number_of_boats(screen):
         for i in range(5)
     ]
 
+    # Variable to store the user's choice
+    selected_number_of_boats = None
+
     while True:
         mouse_up = False
         for event in pygame.event.get():
@@ -241,17 +247,23 @@ def select_number_of_boats(screen):
             if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 mouse_up = True
 
-        screen.blit(bg4, (0, 0))  # Draw the background
+        # Draw the background
+        screen.blit(bg4, (0, 0))
 
+        # Handle return button
         ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
         if ui_action is not None:
             return 0  # Return to main menu or game mode selection
         return_btn.draw(screen)
 
+        # Handle boat selection buttons
         for button in buttons:
             ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
             if ui_action is not None:
-                return ui_action  # Return the number of boats selected
+                selected_number_of_boats = ui_action  # Record the selection
+                print(selected_number_of_boats)
+                return selected_number_of_boats  # Return the selected number of boats
             button.draw(screen)
 
+        # Update the display
         pygame.display.flip()
