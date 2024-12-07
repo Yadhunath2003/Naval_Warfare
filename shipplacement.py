@@ -92,7 +92,7 @@ def create_game_logic(rows, cols):
     """
     return [[' ' for _ in range(cols)] for _ in range(rows)]
 
-def main(player, selected_boats, is_player1=True):
+def ship_placement_main(player, selected_boats, is_player1=True):
     pygame.init()
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption(f"{player.name}'s Ship Placement")
@@ -252,5 +252,4 @@ def main(player, selected_boats, is_player1=True):
         pygame.display.flip()
 
 
-if __name__ == "__main__":
-    main()
+

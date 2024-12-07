@@ -7,6 +7,7 @@ from ui import UIElement  # Import the button class
 BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
 global ships_selected
+global selectedAIMode
 
 # Load background images for different game screens
 bg = pygame.image.load("images/bg.png")
@@ -21,9 +22,6 @@ class GameState(Enum):
     NEWGAME = 1          # Enumeration for starting a new game
     AIMODE = 2           # Enumeration for AI mode
     HUMAN = 3            # Enumeration for human player mode
-    EASYSHIPS = 4
-    MEDIUMSHIPS = 5
-    HARDSHIPS = 6
 
 def create_surface_with_text(text, font_size, text_rgb, bg_rgb):
     """ Create a surface with the specified text written on it. """
@@ -134,7 +132,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="EASY",
-        action=GameState.EASYSHIPS,
+        action=1,
     )
     medium_btn = UIElement(
         center_position=(400, 380),
@@ -142,7 +140,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="MEDIUM",
-        action=GameState.MEDIUMSHIPS,
+        action=2,
     )
     hard_btn = UIElement(
         center_position=(400, 420),
@@ -150,7 +148,7 @@ def ai_mode(screen):
         bg_rgb=BLUE,
         text_rgb=WHITE,
         text="HARD",
-        action=GameState.HARDSHIPS,
+        action=3,
     )
 
     buttons = [easy_btn, medium_btn, hard_btn]
@@ -170,7 +168,8 @@ def ai_mode(screen):
         for button in buttons:
             ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
             if ui_action is not None:
-                return ui_action
+                selectedAIMode = ui_action
+                return GameState.HUMAN
             button.draw(screen)
 
         pygame.display.flip()
@@ -252,8 +251,8 @@ def select_number_of_boats(screen):
 
         # Handle return button
         ui_action = return_btn.update(pygame.mouse.get_pos(), mouse_up)
-        if ui_action is not None:
-            return 0  # Return to main menu or game mode selection
+        if ui_action == GameState.NEWGAME:  # Check if return button was clicked
+            return GameState.NEWGAME  # Return the NEWGAME state
         return_btn.draw(screen)
 
         # Handle boat selection buttons

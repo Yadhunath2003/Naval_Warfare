@@ -1,69 +1,180 @@
 from game_logic import GameBoard
-from ai import AIPlayer
+from player import Player
 
-class NavalWarfareGame:
-    def __init__(self, player_name, ai_difficulty="Medium"):
-        # Initialize boards
-        self.player_board = GameBoard()
-        self.ai_board = GameBoard()
-
-        # Initialize players
-        self.human_player = player_name
-        self.ai_player = AIPlayer(difficulty=ai_difficulty, num_boats=5)
-
-        # Place AI ships
-        self.ai_board.randomly_place_ships([5, 4, 3, 3, 2])  # Standard ship sizes
-
-        # Game state
-        self.current_turn = "Player"
-        self.game_over = False
+class GamePlay:
+    def __init__(self, player1, player2, mode="PvP"):
+        """
+        Initialize the gameplay logic.
+        mode: "PvP" for Player vs. Player, "PvAI" for Player vs. AI.
+        """
+        self.player1 = player1
+        self.player2 = player2
+        self.mode = mode
+        self.current_player = player1
+        self.opponent = player2
         self.winner = None
+        self.game_over = False
 
-    def place_player_ships(self, ships):
+    def attack(self, x, y):
         """
-        Accepts a list of ships to place on the player's board.
-        Each ship is a tuple of (length, orientation, start_position).
+        Handle an attack on the opponent's board.
         """
-        for length, orientation, start_position in ships:
-            placed = self.player_board.place_ship(length, orientation, start_position)
-            if not placed:
-                raise ValueError(f"Invalid placement for ship of length {length} at {start_position}")
+        # Check if the cell has already been attacked
+        if self.opponent.board.grid[y][x] in ["X", "O"]:
+            return {"valid": False, "message": "Cell already attacked. Try again."}
 
-    def check_victory(self, board):
+        # Check for hit or miss
+        if self.opponent.board.grid[y][x] != 0:  # Hit
+            self.opponent.board.grid[y][x] = "X"
+            self.current_player.hits.append((x, y))
+            hit = True
+        else:  # Miss
+            self.opponent.board.grid[y][x] = "O"
+            self.current_player.misses.append((x, y))
+            hit = False
+
+        return {"valid": True, "hit": hit, "message": "Hit!" if hit else "Miss!"}
+
+    def check_victory(self):
         """
-        Check if all ships on a board are sunk.
+        Check if the opponent has lost all their ships.
         """
-        for ship in board.ships:
-            if any(board.grid[y][x] > 0 for x, y in ship["coordinates"]):  # Ship part still afloat
+        for ship in self.opponent.board.ships:
+            if any(self.opponent.board.grid[y][x] > 0 for x, y in ship["coordinates"]):
                 return False
+        self.winner = self.current_player.name
+        self.game_over = True
         return True
 
+    def switch_turns(self):
+        """
+        Switch the current player and opponent.
+        """
+        self.current_player, self.opponent = self.opponent, self.current_player
+
     def process_turn(self, x=None, y=None):
-        if self.current_turn == "Player":
-            if self.ai_board.grid[y][x] in [-1, 2]:  # Invalid move
-                print("You already attacked this location. Try again.")
+        """
+        Process the current player's turn.
+        For AI, make a move automatically.
+        """
+        if self.mode == "PvAI" and self.current_player == self.player2:
+            # AI's turn
+            x, y = self.player2.ai_player.make_move(self.player1.board)
+
+        # Validate the move coordinates
+        if x is None or y is None:
+            return {"valid": False, "message": "Invalid coordinates."}
+
+        # Perform the attack
+        attack_result = self.attack(x, y)
+        if not attack_result["valid"]:
+            return attack_result
+
+        # Check if the game is over
+        if self.check_victory():
+            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!"}
+
+        # Switch turns if the game isn't over
+        self.switch_turns()
+        return attack_result
+
+    def reset_game(self):
+        """
+        Reset the game state for a new match.
+        """
+        self.current_player = self.player1
+        self.opponent = self.player2
+        self.winner = None
+        self.game_over = False
+        self.player1.board = GameBoard()
+        self.player2.board = GameBoard()
+from game_logic import GameBoard
+from player import Player
+
+class GamePlay:
+    def __init__(self, player1, player2, mode="PvP"):
+        """
+        Initialize the gameplay logic.
+        mode: "PvP" for Player vs. Player, "PvAI" for Player vs. AI.
+        """
+        self.player1 = player1
+        self.player2 = player2
+        self.mode = mode
+        self.current_player = player1
+        self.opponent = player2
+        self.winner = None
+        self.game_over = False
+
+    def attack(self, x, y):
+        """
+        Handle an attack on the opponent's board.
+        """
+        # Check if the cell has already been attacked
+        if self.opponent.board.grid[y][x] in ["X", "O"]:
+            return {"valid": False, "message": "Cell already attacked. Try again."}
+
+        # Check for hit or miss
+        if self.opponent.board.grid[y][x] != 0:  # Hit
+            self.opponent.board.grid[y][x] = "X"
+            self.current_player.hits.append((x, y))
+            hit = True
+        else:  # Miss
+            self.opponent.board.grid[y][x] = "O"
+            self.current_player.misses.append((x, y))
+            hit = False
+
+        return {"valid": True, "hit": hit, "message": "Hit!" if hit else "Miss!"}
+
+    def check_victory(self):
+        """
+        Check if the opponent has lost all their ships.
+        """
+        for ship in self.opponent.board.ships:
+            if any(self.opponent.board.grid[y][x] > 0 for x, y in ship["coordinates"]):
                 return False
+        self.winner = self.current_player.name
+        self.game_over = True
+        return True
 
-            hit = self.ai_board.attack(x, y)  # Updates AI's board
-            print("Hit!" if hit else "Miss!")
-            if self.check_victory(self.ai_board):
-                self.game_over = True
-                self.winner = "Player"
-                return True
+    def switch_turns(self):
+        """
+        Switch the current player and opponent.
+        """
+        self.current_player, self.opponent = self.opponent, self.current_player
 
-            # Switch to AI's turn
-            self.current_turn = "AI"
+    def process_turn(self, x=None, y=None):
+        """
+        Process the current player's turn.
+        For AI, make a move automatically.
+        """
+        if self.mode == "PvAI" and self.current_player == self.player2:
+            # AI's turn
+            x, y = self.player2.ai_player.make_move(self.player1.board)
 
-        elif self.current_turn == "AI":
-            # AI selects a move
-            ai_x, ai_y = self.ai_player.make_move(self.player_board)  # AI chooses where to attack
-            hit = self.player_board.attack(ai_x, ai_y)  # AI attacks the player's board
-            print(f"AI attacks ({ai_x}, {ai_y}): {'Hit!' if hit else 'Miss!'}")
+        # Validate the move coordinates
+        if x is None or y is None:
+            return {"valid": False, "message": "Invalid coordinates."}
 
-            if self.check_victory(self.player_board):
-                self.game_over = True
-                self.winner = "AI"
-                return True
+        # Perform the attack
+        attack_result = self.attack(x, y)
+        if not attack_result["valid"]:
+            return attack_result
 
-            # Switch back to Player's turn
-            self.current_turn = "Player"
+        # Check if the game is over
+        if self.check_victory():
+            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!"}
+
+        # Switch turns if the game isn't over
+        self.switch_turns()
+        return attack_result
+
+    def reset_game(self):
+        """
+        Reset the game state for a new match.
+        """
+        self.current_player = self.player1
+        self.opponent = self.player2
+        self.winner = None
+        self.game_over = False
+        self.player1.board = GameBoard()
+        self.player2.board = GameBoard()
