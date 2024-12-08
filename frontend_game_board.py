@@ -62,7 +62,6 @@ def game_loop(game):
     pygame.display.set_caption("Battleship Gameplay")
     font = pygame.font.Font(None, 36)
 
-    # Load background image
     background_image = pygame.image.load("images/bg4.png").convert()
     background_image = pygame.transform.scale(background_image, (1100, 600))
 
@@ -75,8 +74,13 @@ def game_loop(game):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
-                grid_x = (mouse_x - (450 + GRID_SPACING)) // CELL_SIZE  # Adjust offset for opponent's grid
-                grid_y = mouse_y // CELL_SIZE
+                if game.current_player == game.player1:
+                    offset_x, offset_y = 450 + GRID_SPACING, 50
+                else:
+                    offset_x, offset_y = 50, 50
+
+                grid_x = (mouse_x - offset_x) // CELL_SIZE
+                grid_y = (mouse_y - offset_y) // CELL_SIZE
 
                 if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
                     result = game.process_turn(grid_x, grid_y)
@@ -85,17 +89,19 @@ def game_loop(game):
                     elif game.game_over:
                         print(f"Game Over! {game.winner} wins!")
                         running = False
+                else:
+                    print("Click outside valid grid area.")
 
         # Draw background
         window.blit(background_image, (0, 0))
 
         # Draw Player 1's grid
         draw_grid(window, 50, 50)
-        draw_board(window, game.current_player.board.grid, 50, 50, show_ships=True)
+        draw_board(window, game.player1.board.grid, 50, 50, show_ships=(game.current_player == game.player1))
 
-        # Draw Player 2's grid (opponent) with spacing
+        # Draw Player 2's grid
         draw_grid(window, 450 + GRID_SPACING, 50)
-        draw_board(window, game.current_player.board.attack_grid, 450 + GRID_SPACING, 50, show_ships=False)
+        draw_board(window, game.player2.board.grid, 450 + GRID_SPACING, 50, show_ships=(game.current_player == game.player2))
 
         # Display the current player's turn
         display_turn(window, font, game.current_player.name)
@@ -104,3 +110,4 @@ def game_loop(game):
         draw_scorecard(window, font, game.player1, game.player2, 50, 450)
 
         pygame.display.flip()
+
