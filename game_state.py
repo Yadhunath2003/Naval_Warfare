@@ -7,7 +7,6 @@ from ui import UIElement  # Import the button class
 BLUE = (106, 159, 181)
 WHITE = (255, 255, 255)
 global ships_selected
-global selectedAIMode
 
 # Load background images for different game screens
 bg = pygame.image.load("images/bg.png")
@@ -64,6 +63,10 @@ def title_screen(screen):
             button.draw(screen)
 
         pygame.display.flip()
+        
+def get_selectedAIMode():
+    global selectedAIMode
+    return selectedAIMode
 
 def game_mode(screen):
     """ Display the game mode selection with buttons. """
@@ -115,6 +118,8 @@ def game_mode(screen):
 
         pygame.display.flip()
 
+selectedAIMode = 0
+
 def ai_mode(screen):
     """ Display AI difficulty options with buttons. """
     return_btn = UIElement(
@@ -152,7 +157,7 @@ def ai_mode(screen):
     )
 
     buttons = [easy_btn, medium_btn, hard_btn]
-
+    
     while True:
         mouse_up = False
         for event in pygame.event.get():
@@ -168,7 +173,9 @@ def ai_mode(screen):
         for button in buttons:
             ui_action = button.update(pygame.mouse.get_pos(), mouse_up)
             if ui_action is not None:
-                selectedAIMode = ui_action
+                global selectedAIMode
+                selectedAIMode = ui_action  # Store the user's selection
+                print(f"Selected AI Mode: {selectedAIMode}")
                 return GameState.HUMAN
             button.draw(screen)
 
