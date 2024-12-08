@@ -14,6 +14,9 @@ class GamePlay:
         self.opponent = player2
         self.winner = None
         self.game_over = False
+        self.turns = 0  # Track the total number of turns
+        self.player1_turns = 0  # Track Player 1's turns
+        self.player2_turns = 0  # Track Player 2's turns
 
     def attack(self, x, y):
         """
@@ -81,6 +84,13 @@ class GamePlay:
         if self.check_victory():
             return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!"}
 
+        # Increment total and player-specific turn counters
+        self.turns += 1
+        if self.current_player == self.player1:
+            self.player1_turns += 1
+        else:
+            self.player2_turns += 1
+            
         # Switch turns if the game isn't over
         self.switch_turns()
         return attack_result

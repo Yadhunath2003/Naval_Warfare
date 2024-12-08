@@ -2,6 +2,7 @@ import pygame
 import sys
 from naval_warfare_game import GamePlay
 from player import Player
+from end_game import scorecard_screen
 
 # Constants
 WINDOW_WIDTH, WINDOW_HEIGHT = 1100, 600
@@ -58,7 +59,7 @@ def display_turn(window, font, player_name):
 
 def game_loop(game):
     pygame.init()
-    window = pygame.display.set_mode((1100, 600))
+    window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption("Battleship Gameplay")
     font = pygame.font.Font(None, 36)
 
@@ -89,6 +90,22 @@ def game_loop(game):
                     elif game.game_over:
                         print(f"Game Over! {game.winner} wins!")
                         running = False
+                    # Gather game statistics
+                        player1_accuracy = (len(game.player1.hits) / (len(game.player1.hits) + len(game.player1.misses))) * 100 if len(game.player1.hits) + len(game.player1.misses) > 0 else 0
+                        player2_accuracy = (len(game.player2.hits) / (len(game.player2.hits) + len(game.player2.misses))) * 100 if len(game.player2.hits) + len(game.player2.misses) > 0 else 0
+                        game_stats = {
+                            'player1_hits': len(game.player1.hits),
+                            'player1_misses': len(game.player1.misses),
+                            'player2_hits': len(game.player2.hits),
+                            'player2_misses': len(game.player2.misses),
+                            'turns': game.turns,
+                            'player1_turns': game.player1_turns,  # Player 1's turns
+                            'player2_turns': game.player2_turns,  # Player 2's turns
+                            'player1_accuracy': player1_accuracy,
+                            'player2_accuracy': player2_accuracy,
+                            'winner': game.winner
+                        }
+                        scorecard_screen(game_stats, "images/bg4.png")  # Transition to scorecard screen
                 else:
                     print("Click outside valid grid area.")
 
