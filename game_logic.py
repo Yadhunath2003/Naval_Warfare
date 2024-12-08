@@ -5,7 +5,9 @@ class GameBoard:
     def __init__(self, rows=10, cols=10):
         self.rows = rows
         self.cols = cols
-        self.grid = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.grid = [['-' for _ in range(cols)] for _ in range(rows)]
+        self.attack_grid = [['-' for _ in range(cols)] for _ in range(rows)]  # Attack results
+        self.attacked_positions = set()  # Tracks all attacked positions (x, y) on this board
         self.ships = []
 
     def is_valid_placement(self, ship_length, orientation, start_position):
@@ -17,15 +19,27 @@ class GameBoard:
             if x + ship_length > self.cols:  # Out of bounds horizontally
                 return False
             for i in range(ship_length):
-                if self.grid[y][x + i] != 0:  # Overlap check
+                if self.grid[y][x + i] != '-':  # Overlap check
                     return False
         elif orientation == 'vertical':
             if y + ship_length > self.rows:  # Out of bounds vertically
                 return False
             for i in range(ship_length):
-                if self.grid[y + i][x] != 0:  # Overlap check
+                if self.grid[y + i][x] != '-':  # Overlap check
                     return False
         return True
+    
+    def is_attacked(self, x, y):
+        """
+        Checks if a position has already been attacked on this board.
+        """
+        return (x, y) in self.attacked_positions
+
+    def mark_attacked(self, x, y):
+        """
+        Marks a position as attacked on this board.
+        """
+        self.attacked_positions.add((x, y))
 
     def place_ship(self, ship_length, orientation, start_position):
         """
@@ -38,13 +52,14 @@ class GameBoard:
         ship_coordinates = []
         if orientation == 'horizontal':
             for i in range(ship_length):
-                self.grid[y][x + i] = len(self.ships) + 1  # Assign a unique ID
+                self.grid[y][x + i] = 'S'  # Assign a unique ID
                 ship_coordinates.append((x + i, y))
         elif orientation == 'vertical':
             for i in range(ship_length):
-                self.grid[y + i][x] = len(self.ships) + 1  # Assign a unique ID
+                self.grid[y + i][x] = 'S'  # Assign a unique ID
                 ship_coordinates.append((x, y + i))
 
+        # Add the ship to the ships list
         self.ships.append({
             "id": len(self.ships) + 1,
             "length": ship_length,
@@ -52,6 +67,7 @@ class GameBoard:
             "coordinates": ship_coordinates
         })
         return True
+
 
     def randomly_place_ships(self, ship_lengths):
         """
@@ -86,13 +102,13 @@ class GameBoard:
         for row in self.grid:
             print(" ".join(str(cell) for cell in row))
 
-# Example Usage
-if __name__ == "__main__":
-    board = GameBoard()
-    ship_lengths = [5, 4, 3, 2, 1]
-    board.randomly_place_ships(ship_lengths)
-    board.display_grid()
+    def update_attack_grid(self, x, y, result):
+        """
+        Updates the attack grid based on the attack result.
+        """
+        if result:  # Hit
+            self.attack_grid[y][x] = 'X'
+        else:  # Miss
+            self.attack_grid[y][x] = 'O'
 
-    print("Ships:")
-    for ship in board.ships:
-        print(ship)
+    
