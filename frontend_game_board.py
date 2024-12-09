@@ -3,6 +3,7 @@ import sys
 from naval_warfare_game import GamePlay
 from player import Player
 from end_game import scorecard_screen
+import time
 
 # Constants
 WINDOW_WIDTH, WINDOW_HEIGHT = 1100, 600
@@ -57,6 +58,47 @@ def display_turn(window, font, player_name):
     window.blit(text_surface, (WINDOW_WIDTH // 2 - text_surface.get_width() // 2, 10))
 
 
+def blackout_transition(window, font):
+    """
+    Display a blackout screen for 3 seconds during turn transitions.
+    """
+    blackout_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    blackout_surface.fill(BLACK)
+
+    text = "Switching Turns..."
+    text_surface = font.render(text, True, WHITE)
+    text_x = (WINDOW_WIDTH - text_surface.get_width()) // 2
+    text_y = (WINDOW_HEIGHT - text_surface.get_height()) // 2
+    blackout_surface.blit(text_surface, (text_x, text_y))
+
+    # Draw the blackout screen
+    window.blit(blackout_surface, (0, 0))
+    pygame.display.flip()
+
+    # Pause for 2 seconds
+    time.sleep(2)
+
+
+def display_feedback(window, font, message, duration=2):
+    """
+    Display feedback message like 'Hit' or 'Miss' for a specified duration.
+    """
+    feedback_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    feedback_surface.set_alpha(200)  # Slight transparency
+    feedback_surface.fill(BLACK)
+
+    text_surface = font.render(message, True, WHITE)
+    text_x = (WINDOW_WIDTH - text_surface.get_width()) // 2
+    text_y = (WINDOW_HEIGHT - text_surface.get_height()) // 2
+    feedback_surface.blit(text_surface, (text_x, text_y))
+
+    # Draw the feedback screen
+    window.blit(feedback_surface, (0, 0))
+    pygame.display.flip()
+
+    # Pause for the specified duration
+    time.sleep(duration)
+
 def game_loop(game):
     pygame.init()
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -84,32 +126,62 @@ def game_loop(game):
                 grid_y = (mouse_y - offset_y) // CELL_SIZE
 
                 if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                    # Process the player's turn
                     result = game.process_turn(grid_x, grid_y)
+
                     if not result["valid"]:
+                        # Invalid move feedback in the console
                         print(result["message"])
-                    elif game.game_over:
-                        print(f"Game Over! {game.winner} wins!")
-                        running = False
-                    # Gather game statistics
-                        player1_accuracy = (len(game.player1.hits) / (len(game.player1.hits) + len(game.player1.misses))) * 100 if len(game.player1.hits) + len(game.player1.misses) > 0 else 0
-                        player2_accuracy = (len(game.player2.hits) / (len(game.player2.hits) + len(game.player2.misses))) * 100 if len(game.player2.hits) + len(game.player2.misses) > 0 else 0
-                        game_stats = {
-                            'player1_hits': len(game.player1.hits),
-                            'player1_misses': len(game.player1.misses),
-                            'player2_hits': len(game.player2.hits),
-                            'player2_misses': len(game.player2.misses),
-                            'turns': game.turns,
-                            'player1_turns': game.player1_turns,  # Player 1's turns
-                            'player2_turns': game.player2_turns,  # Player 2's turns
-                            'player1_accuracy': player1_accuracy,
-                            'player2_accuracy': player2_accuracy,
-                            'winner': game.winner
-                        }
-                        scorecard_screen(game_stats, "images/bg4.png")  # Transition to scorecard screen
+                    else:
+                        # Show feedback based on the result
+                        if result.get("hit", False):  # Safely check for "hit"
+                            display_feedback(window, font, "Hit!", duration=2)
+                        else:
+                            display_feedback(window, font, "Miss!", duration=2)
+
+
+                        # Check for game over
+                        if game.game_over:
+                            print(f"Game Over! {game.winner} wins!")
+                            running = False
+
+                            # Gather game statistics
+                            player1_accuracy = (len(game.player1.hits) / (len(game.player1.hits) + len(game.player1.misses))) * 100 if len(game.player1.hits) + len(game.player1.misses) > 0 else 0
+                            player2_accuracy = (len(game.player2.hits) / (len(game.player2.hits) + len(game.player2.misses))) * 100 if len(game.player2.hits) + len(game.player2.misses) > 0 else 0
+                            game_stats = {
+                                'player1_hits': len(game.player1.hits),
+                                'player1_misses': len(game.player1.misses),
+                                'player2_hits': len(game.player2.hits),
+                                'player2_misses': len(game.player2.misses),
+                                'turns': game.turns,
+                                'player1_turns': game.player1_turns,  # Player 1's turns
+                                'player2_turns': game.player2_turns,  # Player 2's turns
+                                'player1_accuracy': player1_accuracy,
+                                'player2_accuracy': player2_accuracy,
+                                'winner': game.winner
+                            }
+
+                            # Transition to the scorecard screen
+                            scorecard_screen(game_stats, "images/bg4.png")
+                        else:
+                            # Trigger blackout for turn transition
+                            blackout_transition(window, font)
                 else:
                     print("Click outside valid grid area.")
 
-        # Draw background
+                # AI's turn (automatic)
+        # AI's turn (automatic)
+        if game.mode == "PvAI" and game.current_player == game.player2:
+            print("AI is thinking...")
+            result = game.process_turn()  # AI automatically attacks
+            if not result["valid"]:
+                print(result["message"])
+            elif game.game_over:
+                print(f"Game Over! {game.winner} wins!")
+                running = False
+                scorecard_screen(game_stats, "images/bg4.png")
+
+        # Draw the game background
         window.blit(background_image, (0, 0))
 
         # Draw Player 1's grid
@@ -126,5 +198,5 @@ def game_loop(game):
         # Draw the scorecard
         draw_scorecard(window, font, game.player1, game.player2, 50, 450)
 
+        # Update the display
         pygame.display.flip()
-

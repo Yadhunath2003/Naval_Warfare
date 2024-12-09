@@ -93,6 +93,19 @@ class GameBoard:
         Return the current grid with ship placements for display or game logic.
         """
         return [[cell for cell in row] for row in self.grid]
+    
+    def random_attack(self, opponent_board):
+        """
+        Randomly select an unplayed cell on the opponent's board for an attack.
+        """
+        available_moves = [
+            (x, y) for x in range(self.cols)
+                for y in range(self.rows)
+                if not opponent_board.is_attacked(x, y)
+        ]
+        if not available_moves:
+            return None, None  # No available moves
+        return random.choice(available_moves)
 
     def display_ship_placements(self):
         """

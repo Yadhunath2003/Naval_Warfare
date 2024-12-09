@@ -2,7 +2,7 @@ import pygame
 from game_logic import GameBoard
 import sys
 from game_state import select_number_of_boats
-from player import Player
+from player import Player, AIPlayer
 
 # Constants
 ROWS, COLS = 10, 10
@@ -93,6 +93,13 @@ def create_game_logic(rows, cols):
     return [[' ' for _ in range(cols)] for _ in range(rows)]
 
 def ship_placement_main(player, selected_boats, is_player1=True):
+    if not is_player1 and player.name == "AI":  # AI-specific logic
+        ship_lengths = [5, 4, 3, 2, 1][:selected_boats]
+        print(f"{player.name} is placing ships in the backend...")
+        player.board.randomly_place_ships(ship_lengths)
+        print(f"{player.name}'s ship placement complete.")
+        return
+    
     pygame.init()
     window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
     pygame.display.set_caption(f"{player.name}'s Ship Placement")

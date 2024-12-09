@@ -34,16 +34,27 @@ def main():
                     continue  # Skip further processing and loop back to handle new state
 
                 if selected_boats > 0:  # Ensure the user selects a valid number of ships
-                    # Step 2: Initialize Players
-                    player1 = Player(name="Player")
-                    
-                    print(f"Player placing {selected_boats} ships...")
+                # Step 2: Initialize Players
+                    player1 = Player(name="Player 1")
+                    ai_player = Player(name="AI")
+
+                    print(f"Player 1 placing {selected_boats} ships...")
                     ship_placement_main(player1, selected_boats, is_player1=True)
-                    
-                    print("Player's Board:")
+
+                    print(f"AI is placing {selected_boats} ships...")
+                    ship_placement_main(player=ai_player, selected_boats=selected_boats, is_player1=False)
+
+                    print("Player 1's Board:")
                     player1.board.display_grid()
-                    
-                    print("To be completed");
+
+                    # Optional: Debugging AI board placement
+                    print("AI's Board (Hidden in actual gameplay):")
+                    ai_player.board.display_grid()
+
+                    # Step 3: Transition to gameplay loop
+                    print("Starting the game!")
+                    game = GamePlay(player1, ai_player, mode="PvAI")
+                    game_loop(game)
                     
             # Player vs Player Mode   
             elif selected_ai_mode <= 0:

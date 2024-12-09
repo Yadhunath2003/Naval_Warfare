@@ -1,5 +1,6 @@
 from game_logic import GameBoard
 from player import Player
+import random
 
 class GamePlay:
     def __init__(self, player1, player2, mode="PvP"):
@@ -41,6 +42,18 @@ class GamePlay:
             self.current_player.misses.append((x, y))  # Track miss
             return {"valid": True, "hit": False, "message": "Miss!"}
 
+    def random_attack(self, opponent_board):
+        """
+        Randomly select an unplayed cell on the opponent's board for an attack.
+        """
+        available_moves = [
+            (x, y) for x in range(self.cols)
+                    for y in range(self.rows)
+                    if not opponent_board.is_attacked(x, y)
+        ]
+        if not available_moves:
+            return None, None  # No available moves
+        return random.choice(available_moves)
 
     def check_victory(self):
         """
@@ -66,23 +79,27 @@ class GamePlay:
         """
         if self.mode == "PvAI" and self.current_player == self.player2:
             # AI's turn
-            x, y = self.player2.ai_player.make_move(self.player1.board)
+            x, y = self.current_player.board.random_attack(self.opponent.board)
 
         # Validate the move coordinates
         if x is None or y is None:
-            return {"valid": False, "message": "Invalid coordinates."}
+            return {"valid": False, "message": "Invalid coordinates.", "hit": False}
 
         # Perform the attack
         attack_result = self.attack(x, y)
         if not attack_result["valid"]:
-            return attack_result
-        
+            # Ensure "hit" key is included in the response
+            return {"valid": False, "message": attack_result["message"], "hit": False}
+
+        # Add "hit" to the result if it's not already there
+        attack_result["hit"] = attack_result.get("hit", False)
+
         # Display the updated game state
         self.display_game_state()
 
         # Check if the game is over
         if self.check_victory():
-            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!"}
+            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!", "hit": attack_result["hit"]}
 
         # Increment total and player-specific turn counters
         self.turns += 1
@@ -90,10 +107,12 @@ class GamePlay:
             self.player1_turns += 1
         else:
             self.player2_turns += 1
-            
+
         # Switch turns if the game isn't over
         self.switch_turns()
         return attack_result
+
+
     
     def display_game_state(self):
         """
@@ -119,3 +138,5 @@ class GamePlay:
         self.player1.board = GameBoard()
         self.player2.board = GameBoard()
 
+
+        
