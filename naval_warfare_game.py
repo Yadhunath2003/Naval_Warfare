@@ -70,19 +70,23 @@ class GamePlay:
 
         # Validate the move coordinates
         if x is None or y is None:
-            return {"valid": False, "message": "Invalid coordinates."}
+            return {"valid": False, "message": "Invalid coordinates.", "hit": False}
 
         # Perform the attack
         attack_result = self.attack(x, y)
         if not attack_result["valid"]:
-            return attack_result
-        
+            # Ensure "hit" key is included in the response
+            return {"valid": False, "message": attack_result["message"], "hit": False}
+
+        # Add "hit" to the result if it's not already there
+        attack_result["hit"] = attack_result.get("hit", False)
+
         # Display the updated game state
         self.display_game_state()
 
         # Check if the game is over
         if self.check_victory():
-            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!"}
+            return {"valid": True, "winner": self.winner, "message": f"{self.winner} wins!", "hit": attack_result["hit"]}
 
         # Increment total and player-specific turn counters
         self.turns += 1
@@ -90,10 +94,12 @@ class GamePlay:
             self.player1_turns += 1
         else:
             self.player2_turns += 1
-            
+
         # Switch turns if the game isn't over
         self.switch_turns()
         return attack_result
+
+
     
     def display_game_state(self):
         """

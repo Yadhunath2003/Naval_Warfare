@@ -5,7 +5,6 @@ from player import Player
 from end_game import scorecard_screen
 import time
 
-
 # Constants
 WINDOW_WIDTH, WINDOW_HEIGHT = 1100, 600
 GRID_SIZE = 10
@@ -76,8 +75,9 @@ def blackout_transition(window, font):
     window.blit(blackout_surface, (0, 0))
     pygame.display.flip()
 
-    # Pause for 1 second
+    # Pause for 2 seconds
     time.sleep(2)
+
 
 def display_feedback(window, font, message, duration=2):
     """
@@ -126,19 +126,25 @@ def game_loop(game):
                 grid_y = (mouse_y - offset_y) // CELL_SIZE
 
                 if 0 <= grid_x < GRID_SIZE and 0 <= grid_y < GRID_SIZE:
+                    # Process the player's turn
                     result = game.process_turn(grid_x, grid_y)
+
                     if not result["valid"]:
+                        # Invalid move feedback in the console
                         print(result["message"])
                     else:
                         # Show feedback based on the result
-                        if result["hit"]:
+                        if result.get("hit", False):  # Safely check for "hit"
                             display_feedback(window, font, "Hit!", duration=2)
                         else:
                             display_feedback(window, font, "Miss!", duration=2)
 
+
+                        # Check for game over
                         if game.game_over:
                             print(f"Game Over! {game.winner} wins!")
                             running = False
+
                             # Gather game statistics
                             player1_accuracy = (len(game.player1.hits) / (len(game.player1.hits) + len(game.player1.misses))) * 100 if len(game.player1.hits) + len(game.player1.misses) > 0 else 0
                             player2_accuracy = (len(game.player2.hits) / (len(game.player2.hits) + len(game.player2.misses))) * 100 if len(game.player2.hits) + len(game.player2.misses) > 0 else 0
@@ -154,12 +160,16 @@ def game_loop(game):
                                 'player2_accuracy': player2_accuracy,
                                 'winner': game.winner
                             }
-                            scorecard_screen(game_stats, "images/bg4.png")  # Transition to scorecard screen
-                        else:
-                            # Trigger blackout effect for turn transition
-                            blackout_transition(window, font)
 
-        # Draw background
+                            # Transition to the scorecard screen
+                            scorecard_screen(game_stats, "images/bg4.png")
+                        else:
+                            # Trigger blackout for turn transition
+                            blackout_transition(window, font)
+                else:
+                    print("Click outside valid grid area.")
+
+        # Draw the game background
         window.blit(background_image, (0, 0))
 
         # Draw Player 1's grid
@@ -176,4 +186,6 @@ def game_loop(game):
         # Draw the scorecard
         draw_scorecard(window, font, game.player1, game.player2, 50, 450)
 
+        # Update the display
         pygame.display.flip()
+
