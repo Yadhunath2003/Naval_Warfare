@@ -4,6 +4,7 @@ from shipplacement import ship_placement_main
 from player import Player
 from naval_warfare_game import GamePlay
 from frontend_game_board import game_loop
+from ai import AIPlayer
 
 def main():
     """ Main function to initialize pygame and manage game states. """
@@ -19,51 +20,41 @@ def main():
             game_state = game_mode(screen)
 
         elif game_state == GameState.AIMODE:
-            game_state = ai_mode(screen) 
+            game_state = ai_mode(screen)
 
         elif game_state in [GameState.HUMAN]:
             # Step 1: Select the number of boats
             selected_boats = select_number_of_boats(screen)
             selected_ai_mode = get_selectedAIMode()
-            print(f"Selected AI mode main: {selected_ai_mode}")  # Debugging output
 
-            # AI Mode selected
+            print(f"Selected AI Mode: {selected_ai_mode}")  # Debugging output
+
             if selected_ai_mode > 0:
+                # AI Mode selected
                 if isinstance(selected_boats, GameState):
-                    game_state = selected_boats  # Transition to the selected game state
-                    continue  # Skip further processing and loop back to handle new state
+                    game_state = selected_boats
+                    continue
 
                 if selected_boats > 0:  # Ensure the user selects a valid number of ships
-                # Step 2: Initialize Players
-                    player1 = Player(name="Player 1")
-                    ai_player = Player(name="AI")
-
-                    print(f"Player 1 placing {selected_boats} ships...")
+                    # Step 2: Initialize Players
+                    player1 = Player(name="Player")
+                    
+                    print(f"Player placing {selected_boats} ships...")
                     ship_placement_main(player1, selected_boats, is_player1=True)
-
-                    print(f"AI is placing {selected_boats} ships...")
-                    ship_placement_main(player=ai_player, selected_boats=selected_boats, is_player1=False)
-
-                    print("Player 1's Board:")
+                    
+                    print("Player's Board:")
                     player1.board.display_grid()
-
-                    # Optional: Debugging AI board placement
-                    print("AI's Board (Hidden in actual gameplay):")
-                    ai_player.board.display_grid()
-
-                    # Step 3: Transition to gameplay loop
-                    print("Starting the game!")
-                    game = GamePlay(player1, ai_player, mode="PvAI")
-                    game_loop(game)
+                    
+                    print("To be completed");
                     
             # Player vs Player Mode   
             elif selected_ai_mode <= 0:
                 
                 if isinstance(selected_boats, GameState):
-                    game_state = selected_boats  # Transition to the selected game state
-                    continue  # Skip further processing and loop back to handle new state
+                    game_state = selected_boats
+                    continue
 
-                if selected_boats > 0:  # Ensure the user selects a valid number of ships
+                if selected_boats > 0:
                     # Step 2: Initialize Players
                     player1 = Player(name="Player 1")
                     player2 = Player(name="Player 2")
@@ -84,12 +75,12 @@ def main():
                     player2.board.display_grid()
 
                     # Step 5: Transition to gameplay loop
-                    mode = "PvAI" if game_state == GameState.AIMODE else "PvP"
+                    mode = "PvP"
                     game = GamePlay(player1, player2, mode=mode)
                     game_loop(game)
 
-                    # Step 5: Transition to the title screen or gameplay loop
-                    game_state = GameState.TITLE  # Placeholder: Redirect to title after placement
+                    # Step 6: Transition to the title screen or gameplay loop
+                    game_state = GameState.TITLE
 
         pygame.display.flip()
 

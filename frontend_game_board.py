@@ -169,19 +169,7 @@ def game_loop(game):
                 else:
                     print("Click outside valid grid area.")
 
-                # AI's turn (automatic)
-        # AI's turn (automatic)
-        if game.mode == "PvAI" and game.current_player == game.player2:
-            print("AI is thinking...")
-            result = game.process_turn()  # AI automatically attacks
-            if not result["valid"]:
-                print(result["message"])
-            elif game.game_over:
-                print(f"Game Over! {game.winner} wins!")
-                running = False
-                scorecard_screen(game_stats, "images/bg4.png")
-
-        # Draw the game background
+        # Draw background
         window.blit(background_image, (0, 0))
 
         # Draw Player 1's grid

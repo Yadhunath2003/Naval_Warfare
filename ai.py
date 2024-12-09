@@ -58,14 +58,26 @@ class AIPlayer:
         self.difficulty = difficulty
         self.board = Board()
         self.board.place_ai_boats(num_boats)
-
+        # Add hits and misses attributes
+        self.hits = []
+        self.misses = []
     def make_move(self, opponent_board):
         if self.difficulty == "Easy":
-            return self.easy_move(opponent_board)
+            x, y = self.easy_move(opponent_board)
         elif self.difficulty == "Medium":
-            return self.medium_move(opponent_board)
+            x, y = self.medium_move(opponent_board)
         elif self.difficulty == "Hard":
-            return self.hard_move(opponent_board)
+            x, y = self.hard_move(opponent_board)
+        else:
+            raise ValueError("Invalid difficulty level")
+        # Check if the move hits or misses
+        if opponent_board.is_hit(x, y):
+            self.hits.append((x, y))
+            opponent_board.grid[x][y] = 2  # Mark as hit
+        else:
+            self.misses.append((x, y))
+            opponent_board.grid[x][y] = -1  # Mark as miss
+        return x, y
 
     def easy_move(self, opponent_board):
         x, y = random.randint(0, GRID_SIZE - 1), random.randint(0, GRID_SIZE - 1)
